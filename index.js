@@ -12,9 +12,9 @@ async function run() {
     const additionalCidrEntries = core.getInput("additional_cidr_entries");
 
     const octokit = CreateGithubClient(githubToken);
-    const enterprise = await enterprise.getEnterprise(enterpriseSlug, octokit);
+    // const enterprise = await enterprise.getEnterprise(enterpriseSlug, octokit);
 
-    core.info(`Enterprise account: ${enterprise.name} : ${enterprise.url}`);
+    // core.info(`Enterprise account: ${enterprise.name} : ${enterprise.url}`);
 
     if (!metadataKey && !additionalCidrEntries) {
       throw new Error(
