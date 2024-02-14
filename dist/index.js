@@ -30570,70 +30570,6 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
-/***/ 8396:
-/***/ ((module, __unused_webpack___webpack_exports__, __nccwpck_require__) => {
-
-"use strict";
-/* harmony import */ var _octokit_plugin_throttling__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(9968);
-/* harmony import */ var _octokit_plugin_throttling__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_octokit_plugin_throttling__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _octokit_plugin_retry__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(6298);
-/* harmony import */ var _octokit_plugin_retry__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__nccwpck_require__.n(_octokit_plugin_retry__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _octokit_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(6762);
-/* harmony import */ var _octokit_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_octokit_core__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _octokit_plugin_rest_endpoint_methods__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(3044);
-/* harmony import */ var _octokit_plugin_rest_endpoint_methods__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__nccwpck_require__.n(_octokit_plugin_rest_endpoint_methods__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _octokit_plugin_paginate_rest__WEBPACK_IMPORTED_MODULE_4__ = __nccwpck_require__(4193);
-/* harmony import */ var _octokit_plugin_paginate_rest__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__nccwpck_require__.n(_octokit_plugin_paginate_rest__WEBPACK_IMPORTED_MODULE_4__);
-/* module decorator */ module = __nccwpck_require__.hmd(module);
-
-
-
-
-
-
-const RetryThrottlingOctokit = _octokit_core__WEBPACK_IMPORTED_MODULE_0__.Octokit.plugin(
-  _octokit_plugin_throttling__WEBPACK_IMPORTED_MODULE_1__.throttling,
-  _octokit_plugin_retry__WEBPACK_IMPORTED_MODULE_2__.retry,
-  _octokit_plugin_rest_endpoint_methods__WEBPACK_IMPORTED_MODULE_3__.restEndpointMethods,
-  _octokit_plugin_paginate_rest__WEBPACK_IMPORTED_MODULE_4__.paginateRest
-);
-
-module.exports.create = (token, maxRetries) => {
-  const MAX_RETRIES = maxRetries ? maxRetries : 3;
-
-  const octokit = new RetryThrottlingOctokit({
-    auth: `token ${token}`,
-
-    throttle: {
-      onRateLimit: (retryAfter, options) => {
-        octokit.log.warn(
-          `Request quota exhausted for request ${options.method} ${options.url}`
-        );
-        octokit.log.warn(
-          `  request retries: ${options.request.retryCount}, MAX: ${MAX_RETRIES}`
-        );
-
-        if (options.request.retryCount < MAX_RETRIES) {
-          octokit.log.warn(`Retrying after ${retryAfter} seconds.`);
-          return true;
-        }
-      },
-
-      onAbuseLimit: (retryAfter, options) => {
-        octokit.log.warn(
-          `Abuse detection triggered request ${options.method} ${options.url}`
-        );
-        return false;
-      },
-    },
-  });
-
-  return octokit;
-};
-
-
-/***/ }),
-
 /***/ 9491:
 /***/ ((module) => {
 
@@ -40914,8 +40850,8 @@ exports.visitAsync = visitAsync;
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			id: moduleId,
-/******/ 			loaded: false,
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
 /******/ 	
@@ -40927,9 +40863,6 @@ exports.visitAsync = visitAsync;
 /******/ 		} finally {
 /******/ 			if(threw) delete __webpack_module_cache__[moduleId];
 /******/ 		}
-/******/ 	
-/******/ 		// Flag the module as loaded
-/******/ 		module.loaded = true;
 /******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
@@ -40957,21 +40890,6 @@ exports.visitAsync = visitAsync;
 /******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
 /******/ 				}
 /******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/harmony module decorator */
-/******/ 	(() => {
-/******/ 		__nccwpck_require__.hmd = (module) => {
-/******/ 			module = Object.create(module);
-/******/ 			if (!module.children) module.children = [];
-/******/ 			Object.defineProperty(module, 'exports', {
-/******/ 				enumerable: true,
-/******/ 				set: () => {
-/******/ 					throw new Error('ES Modules may not assign module.exports or exports.*, Use ESM export syntax, instead: ' + module.id);
-/******/ 				}
-/******/ 			});
-/******/ 			return module;
 /******/ 		};
 /******/ 	})();
 /******/ 	
@@ -41008,8 +40926,63 @@ var dist = __nccwpck_require__(4083);
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(2186);
 var core_default = /*#__PURE__*/__nccwpck_require__.n(core);
-// EXTERNAL MODULE: ./src/github.js
-var github = __nccwpck_require__(8396);
+// EXTERNAL MODULE: ./node_modules/@octokit/plugin-throttling/dist-node/index.js
+var dist_node = __nccwpck_require__(9968);
+// EXTERNAL MODULE: ./node_modules/@octokit/plugin-retry/dist-node/index.js
+var plugin_retry_dist_node = __nccwpck_require__(6298);
+// EXTERNAL MODULE: ./node_modules/@octokit/core/dist-node/index.js
+var core_dist_node = __nccwpck_require__(6762);
+// EXTERNAL MODULE: ./node_modules/@octokit/plugin-rest-endpoint-methods/dist-node/index.js
+var plugin_rest_endpoint_methods_dist_node = __nccwpck_require__(3044);
+// EXTERNAL MODULE: ./node_modules/@octokit/plugin-paginate-rest/dist-node/index.js
+var plugin_paginate_rest_dist_node = __nccwpck_require__(4193);
+;// CONCATENATED MODULE: ./src/github.js
+
+
+
+
+
+
+const RetryThrottlingOctokit = core_dist_node.Octokit.plugin(
+  dist_node.throttling,
+  plugin_retry_dist_node.retry,
+  plugin_rest_endpoint_methods_dist_node.restEndpointMethods,
+  plugin_paginate_rest_dist_node.paginateRest
+);
+
+const CreateGithubClient = (token, maxRetries = 3) => {
+  const MAX_RETRIES = maxRetries ? maxRetries : 3;
+
+  const octokit = new RetryThrottlingOctokit({
+    auth: `token ${token}`,
+
+    throttle: {
+      onRateLimit: (retryAfter, options) => {
+        octokit.log.warn(
+          `Request quota exhausted for request ${options.method} ${options.url}`
+        );
+        octokit.log.warn(
+          `  request retries: ${options.request.retryCount}, MAX: ${MAX_RETRIES}`
+        );
+
+        if (options.request.retryCount < MAX_RETRIES) {
+          octokit.log.warn(`Retrying after ${retryAfter} seconds.`);
+          return true;
+        }
+      },
+
+      onAbuseLimit: (retryAfter, options) => {
+        octokit.log.warn(
+          `Abuse detection triggered request ${options.method} ${options.url}`
+        );
+        return false;
+      },
+    },
+  });
+
+  return octokit;
+};
+
 ;// CONCATENATED MODULE: ./src/cidrEntry.js
 class CidrEntry {
   constructor({ name, cidr, isActive = true }) {
@@ -41045,7 +41018,7 @@ async function run() {
     const metadataKey = core_default().getInput("metadata_key");
     const additionalCidrEntries = core_default().getInput("additional_cidr_entries");
 
-    const octokit = github/* default.create */.Z.create(githubToken);
+    const octokit = CreateGithubClient(githubToken);
     const enterprise = await enterprise.getEnterprise(enterpriseSlug, octokit);
 
     core_default().info(`Enterprise account: ${enterprise.name} : ${enterprise.url}`);

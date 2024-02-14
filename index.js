@@ -1,7 +1,7 @@
 import YAML from "yaml";
 import core from "@actions/core";
 
-import githubClient from "./src/github";
+import { CreateGithubClient } from "./src/github";
 import { CidrEntry } from "./src/cidrEntry";
 
 async function run() {
@@ -11,7 +11,7 @@ async function run() {
     const metadataKey = core.getInput("metadata_key");
     const additionalCidrEntries = core.getInput("additional_cidr_entries");
 
-    const octokit = githubClient.create(githubToken);
+    const octokit = CreateGithubClient(githubToken);
     const enterprise = await enterprise.getEnterprise(enterpriseSlug, octokit);
 
     core.info(`Enterprise account: ${enterprise.name} : ${enterprise.url}`);

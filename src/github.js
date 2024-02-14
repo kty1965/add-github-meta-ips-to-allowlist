@@ -11,7 +11,7 @@ const RetryThrottlingOctokit = Octokit.plugin(
   paginateRest
 );
 
-module.exports.create = (token, maxRetries) => {
+export const CreateGithubClient = (token, maxRetries = 3) => {
   const MAX_RETRIES = maxRetries ? maxRetries : 3;
 
   const octokit = new RetryThrottlingOctokit({
