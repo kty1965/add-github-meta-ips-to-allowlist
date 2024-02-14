@@ -38,7 +38,7 @@ async function run() {
     if (metadataKey) {
       const cidrEntries = await getMetaCidrEntries({ metadataKey });
       if (cidrEntries) {
-        expectCidrEntries.push(cidrEntries);
+        expectCidrEntries.push(...cidrEntries);
       } else {
         throw new Error(
           `The metadata cidrEntries for '${metadataKey}' were unable to be resolved.`,
@@ -47,7 +47,7 @@ async function run() {
     }
     if (additionalCidrEntries) {
       const cidrEntries = getAdditionalCidrEntries(additionalCidrEntries);
-      expectCidrEntries.push(cidrEntries);
+      expectCidrEntries.push(...cidrEntries);
     }
 
     core.debug(`existScopedIpAllowListEntries: ${JSON.stringify(existScopedIpAllowListEntries)}`);
