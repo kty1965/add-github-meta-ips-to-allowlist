@@ -1,0 +1,29 @@
+{
+  "name": "add-github-meta-ips-to-allowlist",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "ncc build index.js --license LICENSE"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kty1965/add-github-meta-ips-to-allowlist.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kty1965/add-github-meta-ips-to-allowlist/issues"
+  },
+  "homepage": "https://github.com/kty1965/add-github-meta-ips-to-allowlist#readme",
+  "dependencies": {
+    "@actions/core": "^1.10.1",
+    "@actions/github": "^6.0.0",
+    "yaml": "^2.3.4"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.38.1"
+  }
+}

@@ -1,0 +1,26 @@
+name: "add-github-meta-ips-to-allowlist"
+description: GitHub meta ips store to enterprise ip allowlists
+author: Huy, Tae Young
+branding:
+  icon: alert-circle
+  color: blue
+inputs:
+  github_token:
+    description: The GitHub token that can be used to update the allow list on the enterprise account
+    required: true
+
+  enterprise_slug:
+    description: The GitHub Enterprise account slug
+    required: true
+
+  metadata_key:
+    description: The name of the section of CIDR IP Addresses from the GitHub meta API
+    required: false
+
+  additional_cidr_entries:
+    description: cidr entries
+    required: false
+
+runs:
+  using: "node20"
+  main: "dist/index.js"
