@@ -71,7 +71,7 @@ async function run() {
     });
     core.info(`toUpdate: ${JSON.stringify(toUpdate)}`);
   } catch (err) {
-    core.setFailed(err.message);
+    core.setFailed(err);
   }
 }
 

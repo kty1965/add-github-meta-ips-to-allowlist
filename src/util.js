@@ -1,7 +1,9 @@
 const { CidrEntry } = require("./CidrEntry");
+const { OctokitRest } = require("@octokit/rest");
 
-async function getMetaCIDRs({ octokit, metadataKey }) {
-  const results = await octokit.rest.meta.get();
+async function getMetaCIDRs({ metadataKey }) {
+  const octokitRest = new OctokitRest();
+  const results = await octokitRest.rest.meta.get();
   core.info(`Get https://api.github.com/meta GitHub Meta API CIDRs`);
   return results.data[name];
 }
@@ -30,9 +32,7 @@ export function getAdditionalCidrEntries(value) {
     );
     core.debug(`getAdditionalCidrEntries: ${JSON.stringify(cidrEntries)}`);
   } catch (err) {
-    throw new Error(
-      `additionalCidrEntries yaml string cannot parse ${err.message}`
-    );
+    throw new Error(`additionalCidrEntries yaml string cannot parse ${err}`);
   }
   return cidrEntries;
 }
