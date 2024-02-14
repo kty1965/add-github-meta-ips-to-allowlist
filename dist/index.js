@@ -31060,11 +31060,7 @@ function getToDeleteIpAllowListEntries({
   expectCidrEntries,
 }) {
   // find set existScopedIpAllowListEntries - expectCidrEntries
-  core.info(
-    `getToDeleteIpAllowListEntries.expectCidrEntries: ${JSON.stringify(expectCidrEntries)}`,
-  );
   const expectCidrs = expectCidrEntries.map((cidrEntry) => cidrEntry.cidr);
-  core.info(`getToDeleteIpAllowListEntries.expectCidrs: ${JSON.stringify(expectCidrs)}`);
   const toDeleteIpAllowListEntries = existScopedIpAllowListEntries.filter((scoped) => {
     return expectCidrs.indexOf(scoped.cidr) === -1; // find only exist in existScopedIpAllowListEntries
   });
@@ -31077,7 +31073,6 @@ function getToCreateIpAllowListEntries({
 }) {
   // find set expectCidrEntries -   existScopedIpAllowListEntries
   const existCidrs = existScopedIpAllowListEntries.map((ipAllowListEntry) => ipAllowListEntry.cidr);
-  core.info(`getToCreateIpAllowListEntries.existCidrs: ${JSON.stringify(existCidrs)}`);
   const toCreateIpAllowListEntries = expectCidrEntries.filter((expect) => {
     return existCidrs.indexOf(expect.cidr) === -1; // find only exist in   expectCidrEntries
   });
@@ -31088,13 +31083,9 @@ function getToUpdateIpAllowListEntries({
   existScopedIpAllowListEntries,
   expectCidrEntries,
 }) {
-  core.info(
-    `getToUpdateIpAllowListEntries.expectCidrEntries: ${JSON.stringify(expectCidrEntries)}`,
-  );
-  const expectCidrs = expectCidrEntries.map((cidrEntry) => cidrEntry.cidr);
-  core.info(`getToUpdateIpAllowListEntries.expectCidrs: ${JSON.stringify(expectCidrs)}`);
-  const candidateToUpdateIpAllowListEntries = existScopedIpAllowListEntries.filter((scoped) => {
-    return expectCidrs.indexOf(scoped.cidr) > -1; // find only two sections
+  const existCidrs = existScopedIpAllowListEntries.map((ipAllowListEntry) => ipAllowListEntry.cidr);
+  const candidateToUpdateIpAllowListEntries = expectCidrEntries.filter((scoped) => {
+    return existCidrs.indexOf(scoped.cidr) > -1; // find only two sections
   });
 
   const toUpdateIpAllowListEntries = candidateToUpdateIpAllowListEntries.filter(
