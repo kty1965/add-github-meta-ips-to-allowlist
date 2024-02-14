@@ -40,7 +40,7 @@ async function run() {
       });
 
     if (metadataKey) {
-      const cidrEntries = await getMetaCidrEntries(octokit, metadataKey);
+      const cidrEntries = await getMetaCidrEntries({ metadataKey });
       if (cidrEntries) {
         expectCidrEntries.push(cidrEntries);
       } else {
@@ -54,7 +54,7 @@ async function run() {
       expectCidrEntries.push(cidrEntries);
     }
 
-    const toDelete = getToDeleteIpAllowListEntries({
+    const toDelete = getToCreateIpAllowListEntries({
       existScopedIpAllowListEntries,
       expectCidrEntries,
     });

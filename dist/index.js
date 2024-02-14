@@ -31034,6 +31034,7 @@ const { Octokit } = __nccwpck_require__(5375);
 async function getMetaCIDRs({ metadataKey }) {
   const octokitRest = new Octokit();
   const { data: metadata } = await octokitRest.rest.meta.get();
+  core.info(`metadataKey: ${metadataKey}`);
   core.info(
     `Get https://api.github.com/meta GitHub Meta API CIDRs, ${JSON.stringify(
       metadata[metadataKey]
@@ -31042,8 +31043,8 @@ async function getMetaCIDRs({ metadataKey }) {
   return metadata[metadataKey];
 }
 
-async function getMetaCidrEntries({ octokit, metadataKey }) {
-  const cidrs = await getMetaCIDRs({ octokit, metadataKey });
+async function getMetaCidrEntries({ metadataKey }) {
+  const cidrs = await getMetaCIDRs({ metadataKey });
   const cidrEntries = cidrs.map(
     (cidr) =>
       new CidrEntry({
@@ -41498,7 +41499,7 @@ async function run() {
       });
 
     if (metadataKey) {
-      const cidrEntries = await getMetaCidrEntries(octokit, metadataKey);
+      const cidrEntries = await getMetaCidrEntries({ metadataKey });
       if (cidrEntries) {
         expectCidrEntries.push(cidrEntries);
       } else {
@@ -41512,7 +41513,7 @@ async function run() {
       expectCidrEntries.push(cidrEntries);
     }
 
-    const toDelete = getToDeleteIpAllowListEntries({
+    const toDelete = getToCreateIpAllowListEntries({
       existScopedIpAllowListEntries,
       expectCidrEntries,
     });

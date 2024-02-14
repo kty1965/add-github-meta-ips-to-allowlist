@@ -5,6 +5,7 @@ const { Octokit } = require("@octokit/rest");
 async function getMetaCIDRs({ metadataKey }) {
   const octokitRest = new Octokit();
   const { data: metadata } = await octokitRest.rest.meta.get();
+  core.info(`metadataKey: ${metadataKey}`);
   core.info(
     `Get https://api.github.com/meta GitHub Meta API CIDRs, ${JSON.stringify(
       metadata[metadataKey]
@@ -13,8 +14,8 @@ async function getMetaCIDRs({ metadataKey }) {
   return metadata[metadataKey];
 }
 
-export async function getMetaCidrEntries({ octokit, metadataKey }) {
-  const cidrs = await getMetaCIDRs({ octokit, metadataKey });
+export async function getMetaCidrEntries({ metadataKey }) {
+  const cidrs = await getMetaCIDRs({ metadataKey });
   const cidrEntries = cidrs.map(
     (cidr) =>
       new CidrEntry({
