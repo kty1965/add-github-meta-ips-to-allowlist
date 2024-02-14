@@ -36,6 +36,7 @@ async function run() {
       await GetEnterpriseScopedIpAllowListEntriesCommand({
         enterpriseSlug,
         octokit,
+        scope,
       });
 
     if (metadataKey) {

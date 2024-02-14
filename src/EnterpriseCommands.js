@@ -1,16 +1,26 @@
 import { IpAllowListEntry } from "./ipAllowListEntry";
+const core = require("@actions/core");
 
 export async function GetEnterpriseScopedIpAllowListEntriesCommand({
   enterpriseSlug,
   octokit,
+  scope,
 }) {
   const { enterprise, ipAllowListEntries } =
     await GetEnterpriseIpAllowListEntriesCommand({
       enterpriseSlug,
       octokit,
     });
+
+  core.info(`enterprise: ${JSON.stringify(enterprise)}`);
+  core.info(`ipAllowListEntries: ${JSON.stringify(ipAllowListEntries)}`);
   const scopedIpAllowListEntries = ipAllowListEntries.filter(
-    (IpAllowListEntry) => IpAllowListEntry.name.startsWith("@scope")
+    (IpAllowListEntry) => IpAllowListEntry.name.startsWith(scope)
+  );
+  core.info(
+    `scopedIpAllowListEntries: ${JSON.stringify(
+      scopedIpAllowListEntries
+    )}, scope: ${scope}`
   );
 
   return {
