@@ -13,13 +13,15 @@ export async function GetEnterpriseScopedIpAllowListEntriesCommand({
     });
 
   core.info(`enterprise: ${JSON.stringify(enterprise)}`);
-  core.info(`ipAllowListEntries: ${JSON.stringify(ipAllowListEntries)}`);
+  core.info(
+    `ipAllowListEntries: ${JSON.stringify(ipAllowListEntries.slice(-10))}`
+  );
   const scopedIpAllowListEntries = ipAllowListEntries.filter(
     (IpAllowListEntry) => IpAllowListEntry.name.startsWith(scope)
   );
   core.info(
     `scopedIpAllowListEntries: ${JSON.stringify(
-      scopedIpAllowListEntries
+      scopedIpAllowListEntries.slice(-10)
     )}, scope: ${scope}`
   );
 

@@ -7,7 +7,7 @@ async function getMetaCIDRs({ metadataKey }) {
   core.info(`${JSON.stringify(octokitRest)}`);
   const results = await octokitRest.rest.meta.get();
   core.info(`Get https://api.github.com/meta GitHub Meta API CIDRs`);
-  return results.data[name];
+  return results.data[metadataKey];
 }
 
 export async function getMetaCidrEntries({ octokit, metadataKey }) {

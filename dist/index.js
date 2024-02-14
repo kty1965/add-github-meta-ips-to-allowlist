@@ -30776,13 +30776,15 @@ async function GetEnterpriseScopedIpAllowListEntriesCommand({
     });
 
   core.info(`enterprise: ${JSON.stringify(enterprise)}`);
-  core.info(`ipAllowListEntries: ${JSON.stringify(ipAllowListEntries)}`);
+  core.info(
+    `ipAllowListEntries: ${JSON.stringify(ipAllowListEntries.slice(-10))}`
+  );
   const scopedIpAllowListEntries = ipAllowListEntries.filter(
     (IpAllowListEntry) => IpAllowListEntry.name.startsWith(scope)
   );
   core.info(
     `scopedIpAllowListEntries: ${JSON.stringify(
-      scopedIpAllowListEntries
+      scopedIpAllowListEntries.slice(-10)
     )}, scope: ${scope}`
   );
 
@@ -31034,7 +31036,7 @@ async function getMetaCIDRs({ metadataKey }) {
   core.info(`${JSON.stringify(octokitRest)}`);
   const results = await octokitRest.rest.meta.get();
   core.info(`Get https://api.github.com/meta GitHub Meta API CIDRs`);
-  return results.data[name];
+  return results.data[metadataKey];
 }
 
 async function getMetaCidrEntries({ octokit, metadataKey }) {
