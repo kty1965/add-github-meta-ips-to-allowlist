@@ -30758,18 +30758,28 @@ class IpAllowListEntry {
 
 ;// CONCATENATED MODULE: ./src/EnterpriseCommands.js
 
+const core = __nccwpck_require__(2186);
 
 async function GetEnterpriseScopedIpAllowListEntriesCommand({
   enterpriseSlug,
   octokit,
+  scope,
 }) {
   const { enterprise, ipAllowListEntries } =
     await GetEnterpriseIpAllowListEntriesCommand({
       enterpriseSlug,
       octokit,
     });
+
+  core.info(`enterprise: ${JSON.stringify(enterprise)}`);
+  core.info(`ipAllowListEntries: ${JSON.stringify(ipAllowListEntries)}`);
   const scopedIpAllowListEntries = ipAllowListEntries.filter(
-    (IpAllowListEntry) => IpAllowListEntry.name.startsWith("@scope")
+    (IpAllowListEntry) => IpAllowListEntry.name.startsWith(scope)
+  );
+  core.info(
+    `scopedIpAllowListEntries: ${JSON.stringify(
+      scopedIpAllowListEntries
+    )}, scope: ${scope}`
   );
 
   return {
@@ -31011,11 +31021,13 @@ __nccwpck_require__.r(__webpack_exports__);
 /* harmony export */   "getToDeleteIpAllowListEntries": () => (/* binding */ getToDeleteIpAllowListEntries),
 /* harmony export */   "getToUpdateIpAllowListEntries": () => (/* binding */ getToUpdateIpAllowListEntries)
 /* harmony export */ });
+const core = __nccwpck_require__(2186);
 const { CidrEntry } = __nccwpck_require__(9133);
 const { OctokitRest } = __nccwpck_require__(5375);
 
 async function getMetaCIDRs({ metadataKey }) {
   const octokitRest = new OctokitRest();
+  core.info(`${JSON.stringify(octokitRest)}`);
   const results = await octokitRest.rest.meta.get();
   core.info(`Get https://api.github.com/meta GitHub Meta API CIDRs`);
   return results.data[name];
@@ -41473,6 +41485,7 @@ async function run() {
       await GetEnterpriseScopedIpAllowListEntriesCommand({
         enterpriseSlug,
         octokit,
+        scope,
       });
 
     if (metadataKey) {
