@@ -1,4 +1,3 @@
-const YAML = require("yaml");
 const core = require("@actions/core");
 
 const { CreateGithubClient } = require("./src/GithubClient");

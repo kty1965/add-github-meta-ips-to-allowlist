@@ -1,4 +1,5 @@
 const core = require("@actions/core");
+const YAML = require("yaml");
 const { CidrEntry } = require("./CidrEntry");
 const { Octokit } = require("@octokit/rest");
 
