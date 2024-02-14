@@ -31033,12 +31033,11 @@ const { Octokit } = __nccwpck_require__(5375);
 
 async function getMetaCIDRs({ metadataKey }) {
   const octokitRest = new Octokit();
-  core.info(`${JSON.stringify(octokitRest)}`);
   const { data: metadata } = await octokitRest.rest.meta.get();
   core.info(
-    `Get https://api.github.com/meta GitHub Meta API CIDRs, ${JSON.stringify({
-      metadata,
-    })}`
+    `Get https://api.github.com/meta GitHub Meta API CIDRs, ${JSON.stringify(
+      metadata[metadataKey]
+    )}`
   );
   return metadata[metadataKey];
 }
