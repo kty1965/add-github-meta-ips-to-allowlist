@@ -25,7 +25,7 @@ async function run() {
     if (metadataKey) {
       const cidrs = await getMetaCIDRs(octokit, metadataKey);
       if (cidrs) {
-        core.info(`cidrs: ${JSON.stringify(cidrs)}`);
+        core.info(`cidrs: ${cidrs}`);
       } else {
         throw new Error(
           `The metadata CIDRs for '${metadataKey}' were unable to be resolved.`
@@ -35,7 +35,7 @@ async function run() {
 
     if (additionalCidrEntries) {
       const cidrs = getCidrs(additionalCidrEntries);
-      core.info(`AdditionalCidr CIDRs to add: ${JSON.stringify(cidrs)}`);
+      core.info(`AdditionalCidr CIDRs to add: ${cidrs}`);
     }
   } catch (err) {
     // canncot find enterpriseSlug or githubToken
@@ -53,10 +53,11 @@ async function getMetaCIDRs(octokit, name) {
 }
 
 function getCidrs(value) {
+  let result;
   try {
     const cidrEntries = YAML.parse(value);
-    core.info(JSON.stringify(cidrEntries));
-    const result = cidrEntries.map((cidrEntry) => new CidrEntry(cidrEntry));
+    core.info(cidrEntries);
+    result = cidrEntries.map((cidrEntry) => new CidrEntry(cidrEntry));
   } catch (err) {
     throw new Error(`additionalCidrEntries yaml string cannot parse ${err}`);
   }
