@@ -1,7 +1,7 @@
 export class IpAllowListEntry {
-  constructor({ name, cidr, isActive, createdAt, updatedAt }) {
+  constructor({ name, allowListValue, isActive, createdAt, updatedAt }) {
     this._name = name;
-    this._cidr = cidr;
+    this._allowListValue = allowListValue;
     this._isActive = isActive;
     this._createdAt = createdAt;
     this._updatedAt = updatedAt;
@@ -12,6 +12,10 @@ export class IpAllowListEntry {
   }
 
   get cidr() {
+    return this._allowListValue;
+  }
+
+  get allowListValue() {
     return this._allowListValue;
   }
 

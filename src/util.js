@@ -1,9 +1,9 @@
 const core = require("@actions/core");
 const { CidrEntry } = require("./CidrEntry");
-const { OctokitRest } = require("@octokit/rest");
+const { Octokit } = require("@octokit/rest");
 
 async function getMetaCIDRs({ metadataKey }) {
-  const octokitRest = new OctokitRest();
+  const octokitRest = new Octokit();
   core.info(`${JSON.stringify(octokitRest)}`);
   const results = await octokitRest.rest.meta.get();
   core.info(`Get https://api.github.com/meta GitHub Meta API CIDRs`);

@@ -30727,9 +30727,9 @@ __nccwpck_require__.d(__webpack_exports__, {
 
 ;// CONCATENATED MODULE: ./src/ipAllowListEntry.js
 class IpAllowListEntry {
-  constructor({ name, cidr, isActive, createdAt, updatedAt }) {
+  constructor({ name, allowListValue, isActive, createdAt, updatedAt }) {
     this._name = name;
-    this._cidr = cidr;
+    this._allowListValue = allowListValue;
     this._isActive = isActive;
     this._createdAt = createdAt;
     this._updatedAt = updatedAt;
@@ -30740,6 +30740,10 @@ class IpAllowListEntry {
   }
 
   get cidr() {
+    return this._allowListValue;
+  }
+
+  get allowListValue() {
     return this._allowListValue;
   }
 
@@ -31023,10 +31027,10 @@ __nccwpck_require__.r(__webpack_exports__);
 /* harmony export */ });
 const core = __nccwpck_require__(2186);
 const { CidrEntry } = __nccwpck_require__(9133);
-const { OctokitRest } = __nccwpck_require__(5375);
+const { Octokit } = __nccwpck_require__(5375);
 
 async function getMetaCIDRs({ metadataKey }) {
-  const octokitRest = new OctokitRest();
+  const octokitRest = new Octokit();
   core.info(`${JSON.stringify(octokitRest)}`);
   const results = await octokitRest.rest.meta.get();
   core.info(`Get https://api.github.com/meta GitHub Meta API CIDRs`);
