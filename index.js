@@ -1,8 +1,20 @@
 const YAML = require("yaml");
 const core = require("@actions/core");
 
-const { CreateGithubClient } = require("./src/github");
-const { CidrEntry } = require("./src/cidrEntry");
+const { CreateGithubClient } = require("./src/GithubClient");
+
+const {
+  GetEnterpriseScopedIpAllowListEntriesCommand,
+} = require("./src/EnterpriseCommands");
+
+const {
+  getMetaCidrEntries,
+  getAdditionalCidrEntries,
+  getToDeleteIpAllowListEntries,
+  getToCreateIpAllowListEntries,
+} = require("./src/util");
+
+const expectCidrEntries = [];
 
 async function run() {
   try {
@@ -10,11 +22,9 @@ async function run() {
     const enterpriseSlug = core.getInput("enterprise_slug", { required: true });
     const metadataKey = core.getInput("metadata_key");
     const additionalCidrEntries = core.getInput("additional_cidr_entries");
+    const scope = core.getInput("scope");
 
     const octokit = CreateGithubClient(githubToken);
-    // const enterprise = await enterprise.getEnterprise(enterpriseSlug, octokit);
-
-    // core.info(`Enterprise account: ${enterprise.name} : ${enterprise.url}`);
 
     if (!metadataKey && !additionalCidrEntries) {
       throw new Error(
@@ -22,44 +32,47 @@ async function run() {
       );
     }
 
+    const { enterprise, ipAllowListEntries: existScopedIpAllowListEntries } =
+      await GetEnterpriseScopedIpAllowListEntriesCommand({
+        enterpriseSlug,
+        octokit,
+      });
+
     if (metadataKey) {
-      const cidrs = await getMetaCIDRs(octokit, metadataKey);
-      if (cidrs) {
-        core.info(`cidrs: ${cidrs}`);
+      const cidrEntries = await getMetaCidrEntries(octokit, metadataKey);
+      if (cidrEntries) {
+        expectCidrEntries.push(cidrEntries);
       } else {
         throw new Error(
-          `The metadata CIDRs for '${metadataKey}' were unable to be resolved.`
+          `The metadata cidrEntries for '${metadataKey}' were unable to be resolved.`
         );
       }
     }
-
     if (additionalCidrEntries) {
-      const cidrs = getCidrs(additionalCidrEntries);
-      core.info(`AdditionalCidr CIDRs to add: ${cidrs}`);
+      const cidrEntries = getAdditionalCidrEntries(additionalCidrEntries);
+      expectCidrEntries.push(cidrEntries);
     }
+
+    const toDelete = getToDeleteIpAllowListEntries({
+      existScopedIpAllowListEntries,
+      expectCidrEntries,
+    });
+    core.info(`toDelete: ${JSON.stringify(toDelete)}`);
+
+    const toCreate = getToDeleteIpAllowListEntries({
+      existScopedIpAllowListEntries,
+      expectCidrEntries,
+    });
+    core.info(`toCreate: ${JSON.stringify(toCreate)}`);
+
+    const toUpdate = getToUpdateIpAllowListEntries({
+      existScopedIpAllowListEntries,
+      expectCidrEntries,
+    });
+    core.info(`toUpdate: ${JSON.stringify(toUpdate)}`);
   } catch (err) {
-    // canncot find enterpriseSlug or githubToken
     core.setFailed(err.message);
   }
 }
 
 run();
-
-async function getMetaCIDRs(octokit, name) {
-  const results = await octokit.rest.meta.get();
-  core.info(`Get https://api.github.com/meta GitHub Meta API CIDRs`);
-
-  return results.data[name];
-}
-
-function getCidrs(value) {
-  let result;
-  try {
-    const cidrEntries = YAML.parse(value);
-    core.info(cidrEntries);
-    result = cidrEntries.map((cidrEntry) => new CidrEntry(cidrEntry));
-  } catch (err) {
-    throw new Error(`additionalCidrEntries yaml string cannot parse ${err}`);
-  }
-  return result;
-}

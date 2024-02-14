@@ -21,6 +21,11 @@ inputs:
     description: cidr entries
     required: false
 
+  scope:
+    description: scope prefix name
+    required: false
+    default: "@scope"
+
 runs:
   using: "node20"
   main: "dist/index.js"

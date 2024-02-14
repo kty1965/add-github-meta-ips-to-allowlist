@@ -16,6 +16,7 @@ A GitHub Action that will load Enterprise IP Allow List Entries from the [GitHub
 | `enterprise_slug`         | true     | The slug for the enterprise account to be modified. `Required`                                                                                                          |
 | `metadata_key`            | false    | Check the [meta API](https://api.github.com/meta), `dependabot`, `actions`, `importer`, `pages`, `packages`, `github_enterprise_importer`, `git`, `api`, `web`, `hooks` |
 | `additional_cidr_entries` | false    | additional cidr entries with yaml string names                                                                                                                          |
+| `scope`                   | false    | default: `@scope`, select prefix of name                                                                                                                                |
 
 ## Examples
 
