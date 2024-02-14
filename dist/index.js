@@ -30570,6 +30570,96 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 3115:
+/***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
+
+"use strict";
+__nccwpck_require__.r(__webpack_exports__);
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   "CidrEntry": () => (/* binding */ CidrEntry)
+/* harmony export */ });
+class CidrEntry {
+  constructor({ name, cidr, isActive = true }) {
+    this.name = name;
+    this.cidr = cidr;
+    this.isActive = isActive;
+  }
+
+  get name() {
+    return this.name;
+  }
+
+  get cidr() {
+    return this.cidr;
+  }
+
+  get isActive() {
+    return this.isActive;
+  }
+}
+
+
+/***/ }),
+
+/***/ 8396:
+/***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
+
+"use strict";
+__nccwpck_require__.r(__webpack_exports__);
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   "CreateGithubClient": () => (/* binding */ CreateGithubClient)
+/* harmony export */ });
+const { throttling } = __nccwpck_require__(9968);
+const { retry } = __nccwpck_require__(6298);
+const { Octokit } = __nccwpck_require__(6762);
+const {
+  restEndpointMethods,
+} = __nccwpck_require__(3044);
+const { paginateRest } = __nccwpck_require__(4193);
+
+const RetryThrottlingOctokit = Octokit.plugin(
+  throttling,
+  retry,
+  restEndpointMethods,
+  paginateRest
+);
+
+const CreateGithubClient = (token, maxRetries = 3) => {
+  const MAX_RETRIES = maxRetries ? maxRetries : 3;
+
+  const octokit = new RetryThrottlingOctokit({
+    auth: `token ${token}`,
+
+    throttle: {
+      onRateLimit: (retryAfter, options) => {
+        octokit.log.warn(
+          `Request quota exhausted for request ${options.method} ${options.url}`
+        );
+        octokit.log.warn(
+          `  request retries: ${options.request.retryCount}, MAX: ${MAX_RETRIES}`
+        );
+
+        if (options.request.retryCount < MAX_RETRIES) {
+          octokit.log.warn(`Retrying after ${retryAfter} seconds.`);
+          return true;
+        }
+      },
+
+      onAbuseLimit: (retryAfter, options) => {
+        octokit.log.warn(
+          `Abuse detection triggered request ${options.method} ${options.url}`
+        );
+        return false;
+      },
+    },
+  });
+
+  return octokit;
+};
+
+
+/***/ }),
+
 /***/ 9491:
 /***/ ((module) => {
 
@@ -40869,18 +40959,6 @@ exports.visitAsync = visitAsync;
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__nccwpck_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__nccwpck_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
@@ -40915,113 +40993,25 @@ exports.visitAsync = visitAsync;
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-"use strict";
-// ESM COMPAT FLAG
-__nccwpck_require__.r(__webpack_exports__);
+const YAML = __nccwpck_require__(4083);
+const core = __nccwpck_require__(2186);
 
-// EXTERNAL MODULE: ./node_modules/yaml/dist/index.js
-var dist = __nccwpck_require__(4083);
-// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
-var core = __nccwpck_require__(2186);
-var core_default = /*#__PURE__*/__nccwpck_require__.n(core);
-// EXTERNAL MODULE: ./node_modules/@octokit/plugin-throttling/dist-node/index.js
-var dist_node = __nccwpck_require__(9968);
-// EXTERNAL MODULE: ./node_modules/@octokit/plugin-retry/dist-node/index.js
-var plugin_retry_dist_node = __nccwpck_require__(6298);
-// EXTERNAL MODULE: ./node_modules/@octokit/core/dist-node/index.js
-var core_dist_node = __nccwpck_require__(6762);
-// EXTERNAL MODULE: ./node_modules/@octokit/plugin-rest-endpoint-methods/dist-node/index.js
-var plugin_rest_endpoint_methods_dist_node = __nccwpck_require__(3044);
-// EXTERNAL MODULE: ./node_modules/@octokit/plugin-paginate-rest/dist-node/index.js
-var plugin_paginate_rest_dist_node = __nccwpck_require__(4193);
-;// CONCATENATED MODULE: ./src/github.js
-
-
-
-
-
-
-const RetryThrottlingOctokit = core_dist_node.Octokit.plugin(
-  dist_node.throttling,
-  plugin_retry_dist_node.retry,
-  plugin_rest_endpoint_methods_dist_node.restEndpointMethods,
-  plugin_paginate_rest_dist_node.paginateRest
-);
-
-const CreateGithubClient = (token, maxRetries = 3) => {
-  const MAX_RETRIES = maxRetries ? maxRetries : 3;
-
-  const octokit = new RetryThrottlingOctokit({
-    auth: `token ${token}`,
-
-    throttle: {
-      onRateLimit: (retryAfter, options) => {
-        octokit.log.warn(
-          `Request quota exhausted for request ${options.method} ${options.url}`
-        );
-        octokit.log.warn(
-          `  request retries: ${options.request.retryCount}, MAX: ${MAX_RETRIES}`
-        );
-
-        if (options.request.retryCount < MAX_RETRIES) {
-          octokit.log.warn(`Retrying after ${retryAfter} seconds.`);
-          return true;
-        }
-      },
-
-      onAbuseLimit: (retryAfter, options) => {
-        octokit.log.warn(
-          `Abuse detection triggered request ${options.method} ${options.url}`
-        );
-        return false;
-      },
-    },
-  });
-
-  return octokit;
-};
-
-;// CONCATENATED MODULE: ./src/cidrEntry.js
-class CidrEntry {
-  constructor({ name, cidr, isActive = true }) {
-    this.name = name;
-    this.cidr = cidr;
-    this.isActive = isActive;
-  }
-
-  get name() {
-    return this.name;
-  }
-
-  get cidr() {
-    return this.cidr;
-  }
-
-  get isActive() {
-    return this.isActive;
-  }
-}
-
-;// CONCATENATED MODULE: ./index.js
-
-
-
-
-
+const { CreateGithubClient } = __nccwpck_require__(8396);
+const { CidrEntry } = __nccwpck_require__(3115);
 
 async function run() {
   try {
-    const githubToken = core_default().getInput("github_token", { required: true });
-    const enterpriseSlug = core_default().getInput("enterprise_slug", { required: true });
-    const metadataKey = core_default().getInput("metadata_key");
-    const additionalCidrEntries = core_default().getInput("additional_cidr_entries");
+    const githubToken = core.getInput("github_token", { required: true });
+    const enterpriseSlug = core.getInput("enterprise_slug", { required: true });
+    const metadataKey = core.getInput("metadata_key");
+    const additionalCidrEntries = core.getInput("additional_cidr_entries");
 
     const octokit = CreateGithubClient(githubToken);
     const enterprise = await enterprise.getEnterprise(enterpriseSlug, octokit);
 
-    core_default().info(`Enterprise account: ${enterprise.name} : ${enterprise.url}`);
+    core.info(`Enterprise account: ${enterprise.name} : ${enterprise.url}`);
 
     if (!metadataKey && !additionalCidrEntries) {
       throw new Error(
@@ -41032,7 +41022,7 @@ async function run() {
     if (metadataKey) {
       const cidrs = await getMetaCIDRs(octokit, metadataKey);
       if (cidrs) {
-        core_default().info(`cidrs: ${JSON.stringify(cidrs)}`);
+        core.info(`cidrs: ${JSON.stringify(cidrs)}`);
       } else {
         throw new Error(
           `The metadata CIDRs for '${metadataKey}' were unable to be resolved.`
@@ -41042,11 +41032,11 @@ async function run() {
 
     if (additionalCidrEntries) {
       const cidrs = getCidrs(additionalCidrEntries);
-      core_default().info(`AdditionalCidr CIDRs to add: ${JSON.stringify(cidrs)}`);
+      core.info(`AdditionalCidr CIDRs to add: ${JSON.stringify(cidrs)}`);
     }
   } catch (err) {
     // canncot find enterpriseSlug or githubToken
-    core_default().setFailed(err);
+    core.setFailed(err.message);
   }
 }
 
@@ -41054,14 +41044,14 @@ run();
 
 async function getMetaCIDRs(octokit, name) {
   const results = await octokit.rest.meta.get();
-  core_default().info(`Get https://api.github.com/meta GitHub Meta API CIDRs`);
+  core.info(`Get https://api.github.com/meta GitHub Meta API CIDRs`);
 
   return results.data[name];
 }
 
 function getCidrs(value) {
   try {
-    const cidrEntries = dist.parse(value);
+    const cidrEntries = YAML.parse(value);
     const result = cidrEntries.map((cidrEntry) => new CidrEntry(cidrEntry));
   } catch (err) {
     throw new Error(`additionalCidrEntries yaml string cannot parse ${err}`);

@@ -1,8 +1,8 @@
-import YAML from "yaml";
-import core from "@actions/core";
+const YAML = require("yaml");
+const core = require("@actions/core");
 
-import { CreateGithubClient } from "./src/github";
-import { CidrEntry } from "./src/cidrEntry";
+const { CreateGithubClient } = require("./src/github");
+const { CidrEntry } = require("./src/cidrEntry");
 
 async function run() {
   try {
@@ -39,7 +39,7 @@ async function run() {
     }
   } catch (err) {
     // canncot find enterpriseSlug or githubToken
-    core.setFailed(err);
+    core.setFailed(err.message);
   }
 }
 

@@ -1,8 +1,10 @@
-import { throttling } from "@octokit/plugin-throttling";
-import { retry } from "@octokit/plugin-retry";
-import { Octokit } from "@octokit/core";
-import { restEndpointMethods } from "@octokit/plugin-rest-endpoint-methods";
-import { paginateRest } from "@octokit/plugin-paginate-rest";
+const { throttling } = require("@octokit/plugin-throttling");
+const { retry } = require("@octokit/plugin-retry");
+const { Octokit } = require("@octokit/core");
+const {
+  restEndpointMethods,
+} = require("@octokit/plugin-rest-endpoint-methods");
+const { paginateRest } = require("@octokit/plugin-paginate-rest");
 
 const RetryThrottlingOctokit = Octokit.plugin(
   throttling,
