@@ -46,6 +46,9 @@ export function getToDeleteIpAllowListEntries({
   expectCidrEntries,
 }) {
   // find set existScopedIpAllowListEntries - expectCidrEntries
+  core.info(
+    `getToDeleteIpAllowListEntries.expectCidrEntries: ${JSON.stringify(expectCidrEntries)}`,
+  );
   const expectCidrs = expectCidrEntries.map((cidrEntry) => cidrEntry.cidr);
   core.info(`getToDeleteIpAllowListEntries.expectCidrs: ${JSON.stringify(expectCidrs)}`);
   const toDeleteIpAllowListEntries = existScopedIpAllowListEntries.filter((scoped) => {
@@ -71,6 +74,9 @@ export function getToUpdateIpAllowListEntries({
   existScopedIpAllowListEntries,
   expectCidrEntries,
 }) {
+  core.info(
+    `getToUpdateIpAllowListEntries.expectCidrEntries: ${JSON.stringify(expectCidrEntries)}`,
+  );
   const expectCidrs = expectCidrEntries.map((cidrEntry) => cidrEntry.cidr);
   core.info(`getToUpdateIpAllowListEntries.expectCidrs: ${JSON.stringify(expectCidrs)}`);
   const candidateToUpdateIpAllowListEntries = existScopedIpAllowListEntries.filter((scoped) => {
