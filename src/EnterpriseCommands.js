@@ -1,28 +1,26 @@
-import { IpAllowListEntry } from "./ipAllowListEntry";
-const core = require("@actions/core");
+const { IpAllowListEntry } = require('./ipAllowListEntry');
+
+const core = require('@actions/core');
 
 export async function GetEnterpriseScopedIpAllowListEntriesCommand({
   enterpriseSlug,
   octokit,
   scope,
 }) {
-  const { enterprise, ipAllowListEntries } =
-    await GetEnterpriseIpAllowListEntriesCommand({
-      enterpriseSlug,
-      octokit,
-    });
+  const { enterprise, ipAllowListEntries } = await GetEnterpriseIpAllowListEntriesCommand({
+    enterpriseSlug,
+    octokit,
+  });
 
-  core.info(`enterprise: ${JSON.stringify(enterprise)}`);
-  core.info(
-    `ipAllowListEntries: ${JSON.stringify(ipAllowListEntries.slice(-10))}`
+  core.debug(`enterprise: ${JSON.stringify(enterprise)}`);
+  core.debug(`ipAllowListEntries last(10): ${JSON.stringify(ipAllowListEntries.slice(-10))}`);
+  const scopedIpAllowListEntries = ipAllowListEntries.filter((IpAllowListEntry) =>
+    IpAllowListEntry.name.startsWith(scope),
   );
-  const scopedIpAllowListEntries = ipAllowListEntries.filter(
-    (IpAllowListEntry) => IpAllowListEntry.name.startsWith(scope)
-  );
-  core.info(
-    `scopedIpAllowListEntries: ${JSON.stringify(
-      scopedIpAllowListEntries.slice(-10)
-    )}, scope: ${scope}`
+  core.debug(
+    `scopedIpAllowListEntries last(10): ${JSON.stringify(
+      scopedIpAllowListEntries.slice(-10),
+    )}, scope: ${scope}`,
   );
 
   return {
@@ -30,10 +28,7 @@ export async function GetEnterpriseScopedIpAllowListEntriesCommand({
     ipAllowListEntries: scopedIpAllowListEntries,
   };
 }
-export async function GetEnterpriseIpAllowListEntriesCommand({
-  enterpriseSlug,
-  octokit,
-}) {
+export async function GetEnterpriseIpAllowListEntriesCommand({ enterpriseSlug, octokit }) {
   const ipAllowListEntries = [];
   const queryParameters = {
     query: `
@@ -83,23 +78,21 @@ export async function GetEnterpriseIpAllowListEntriesCommand({
 
     const ipEntries = getObject(
       queryResult,
-      "enterprise",
-      "ownerInfo",
-      "ipAllowListEntries",
-      "nodes"
+      'enterprise',
+      'ownerInfo',
+      'ipAllowListEntries',
+      'nodes',
     );
     if (ipEntries) {
-      ipAllowListEntries.push(
-        ...ipEntries.map((data) => new IpAllowListEntry(data))
-      );
+      ipAllowListEntries.push(...ipEntries.map((data) => new IpAllowListEntry(data)));
     }
 
     const pageInfo = getObject(
       queryResult,
-      "enterprise",
-      "ownerInfo",
-      "ipAllowListEntries",
-      "pageInfo"
+      'enterprise',
+      'ownerInfo',
+      'ipAllowListEntries',
+      'pageInfo',
     );
     hasNextPage = pageInfo ? pageInfo.hasNextPage : false;
     if (hasNextPage) {

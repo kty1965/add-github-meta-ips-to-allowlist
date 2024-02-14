@@ -1,34 +1,31 @@
-const core = require("@actions/core");
+const core = require('@actions/core');
 
-const { CreateGithubClient } = require("./src/GithubClient");
+const { CreateGithubClient } = require('./src/GithubClient');
 
-const {
-  GetEnterpriseScopedIpAllowListEntriesCommand,
-} = require("./src/EnterpriseCommands");
+const { GetEnterpriseScopedIpAllowListEntriesCommand } = require('./src/EnterpriseCommands');
 
 const {
   getMetaCidrEntries,
   getAdditionalCidrEntries,
   getToDeleteIpAllowListEntries,
   getToCreateIpAllowListEntries,
-} = require("./src/util");
+  getToUpdateIpAllowListEntries,
+} = require('./src/util');
 
 const expectCidrEntries = [];
 
 async function run() {
   try {
-    const githubToken = core.getInput("github_token", { required: true });
-    const enterpriseSlug = core.getInput("enterprise_slug", { required: true });
-    const metadataKey = core.getInput("metadata_key");
-    const additionalCidrEntries = core.getInput("additional_cidr_entries");
-    const scope = core.getInput("scope");
+    const githubToken = core.getInput('github_token', { required: true });
+    const enterpriseSlug = core.getInput('enterprise_slug', { required: true });
+    const metadataKey = core.getInput('metadata_key');
+    const additionalCidrEntries = core.getInput('additional_cidr_entries');
+    const scope = core.getInput('scope');
 
     const octokit = CreateGithubClient(githubToken);
 
     if (!metadataKey && !additionalCidrEntries) {
-      throw new Error(
-        "A set of additionalCidrEntries or GitHub metadataKey must be specified."
-      );
+      throw new Error('A set of additionalCidrEntries or GitHub metadataKey must be specified.');
     }
 
     const { enterprise, ipAllowListEntries: existScopedIpAllowListEntries } =
@@ -44,7 +41,7 @@ async function run() {
         expectCidrEntries.push(cidrEntries);
       } else {
         throw new Error(
-          `The metadata cidrEntries for '${metadataKey}' were unable to be resolved.`
+          `The metadata cidrEntries for '${metadataKey}' were unable to be resolved.`,
         );
       }
     }
@@ -53,13 +50,13 @@ async function run() {
       expectCidrEntries.push(cidrEntries);
     }
 
-    const toDelete = getToCreateIpAllowListEntries({
+    const toDelete = getToDeleteIpAllowListEntries({
       existScopedIpAllowListEntries,
       expectCidrEntries,
     });
     core.info(`toDelete: ${JSON.stringify(toDelete)}`);
 
-    const toCreate = getToDeleteIpAllowListEntries({
+    const toCreate = getToCreateIpAllowListEntries({
       existScopedIpAllowListEntries,
       expectCidrEntries,
     });

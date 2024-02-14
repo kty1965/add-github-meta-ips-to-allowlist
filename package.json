@@ -33,15 +33,12 @@
     "yaml": "^2.3.4"
   },
   "devDependencies": {
-    "@vercel/ncc": "^0.38.1",
     "@commitlint/cli": "^18.1.0",
-    "eslint": "^8.31.0",
-    "eslint-config-prettier": "^8.6.0",
-    "eslint-plugin-import": "^2.26.0",
+    "@vercel/ncc": "^0.38.1",
     "cz-conventional-changelog": "^3.3.0",
+    "husky": "^8.0.3",
     "lint-staged": "^13.1.0",
-    "prettier": "^2.8.1",
-    "husky": "^8.0.3"
+    "prettier": "^2.8.1"
   },
   "config": {
     "1": {

@@ -30712,55 +30712,16 @@ class CidrEntry {
 
 /***/ }),
 
-/***/ 8455:
+/***/ 7587:
 /***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
 
 "use strict";
-// ESM COMPAT FLAG
 __nccwpck_require__.r(__webpack_exports__);
-
-// EXPORTS
-__nccwpck_require__.d(__webpack_exports__, {
-  "GetEnterpriseIpAllowListEntriesCommand": () => (/* binding */ GetEnterpriseIpAllowListEntriesCommand),
-  "GetEnterpriseScopedIpAllowListEntriesCommand": () => (/* binding */ GetEnterpriseScopedIpAllowListEntriesCommand)
-});
-
-;// CONCATENATED MODULE: ./src/ipAllowListEntry.js
-class IpAllowListEntry {
-  constructor({ name, allowListValue, isActive, createdAt, updatedAt }) {
-    this._name = name;
-    this._allowListValue = allowListValue;
-    this._isActive = isActive;
-    this._createdAt = createdAt;
-    this._updatedAt = updatedAt;
-  }
-
-  get name() {
-    return this._name;
-  }
-
-  get cidr() {
-    return this._allowListValue;
-  }
-
-  get allowListValue() {
-    return this._allowListValue;
-  }
-
-  get isActive() {
-    return this._isActive;
-  }
-
-  get createdAt() {
-    return this._createdAt;
-  }
-
-  get updatedAt() {
-    return this._updatedAt;
-  }
-}
-
-;// CONCATENATED MODULE: ./src/EnterpriseCommands.js
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   "GetEnterpriseIpAllowListEntriesCommand": () => (/* binding */ GetEnterpriseIpAllowListEntriesCommand),
+/* harmony export */   "GetEnterpriseScopedIpAllowListEntriesCommand": () => (/* binding */ GetEnterpriseScopedIpAllowListEntriesCommand)
+/* harmony export */ });
+const { IpAllowListEntry } = __nccwpck_require__(2980);
 
 const core = __nccwpck_require__(2186);
 
@@ -30769,23 +30730,20 @@ async function GetEnterpriseScopedIpAllowListEntriesCommand({
   octokit,
   scope,
 }) {
-  const { enterprise, ipAllowListEntries } =
-    await GetEnterpriseIpAllowListEntriesCommand({
-      enterpriseSlug,
-      octokit,
-    });
+  const { enterprise, ipAllowListEntries } = await GetEnterpriseIpAllowListEntriesCommand({
+    enterpriseSlug,
+    octokit,
+  });
 
-  core.info(`enterprise: ${JSON.stringify(enterprise)}`);
-  core.info(
-    `ipAllowListEntries: ${JSON.stringify(ipAllowListEntries.slice(-10))}`
+  core.debug(`enterprise: ${JSON.stringify(enterprise)}`);
+  core.debug(`ipAllowListEntries last(10): ${JSON.stringify(ipAllowListEntries.slice(-10))}`);
+  const scopedIpAllowListEntries = ipAllowListEntries.filter((IpAllowListEntry) =>
+    IpAllowListEntry.name.startsWith(scope),
   );
-  const scopedIpAllowListEntries = ipAllowListEntries.filter(
-    (IpAllowListEntry) => IpAllowListEntry.name.startsWith(scope)
-  );
-  core.info(
-    `scopedIpAllowListEntries: ${JSON.stringify(
-      scopedIpAllowListEntries.slice(-10)
-    )}, scope: ${scope}`
+  core.debug(
+    `scopedIpAllowListEntries last(10): ${JSON.stringify(
+      scopedIpAllowListEntries.slice(-10),
+    )}, scope: ${scope}`,
   );
 
   return {
@@ -30793,10 +30751,7 @@ async function GetEnterpriseScopedIpAllowListEntriesCommand({
     ipAllowListEntries: scopedIpAllowListEntries,
   };
 }
-async function GetEnterpriseIpAllowListEntriesCommand({
-  enterpriseSlug,
-  octokit,
-}) {
+async function GetEnterpriseIpAllowListEntriesCommand({ enterpriseSlug, octokit }) {
   const ipAllowListEntries = [];
   const queryParameters = {
     query: `
@@ -30846,23 +30801,21 @@ async function GetEnterpriseIpAllowListEntriesCommand({
 
     const ipEntries = getObject(
       queryResult,
-      "enterprise",
-      "ownerInfo",
-      "ipAllowListEntries",
-      "nodes"
+      'enterprise',
+      'ownerInfo',
+      'ipAllowListEntries',
+      'nodes',
     );
     if (ipEntries) {
-      ipAllowListEntries.push(
-        ...ipEntries.map((data) => new IpAllowListEntry(data))
-      );
+      ipAllowListEntries.push(...ipEntries.map((data) => new IpAllowListEntry(data)));
     }
 
     const pageInfo = getObject(
       queryResult,
-      "enterprise",
-      "ownerInfo",
-      "ipAllowListEntries",
-      "pageInfo"
+      'enterprise',
+      'ownerInfo',
+      'ipAllowListEntries',
+      'pageInfo',
     );
     hasNextPage = pageInfo ? pageInfo.hasNextPage : false;
     if (hasNextPage) {
@@ -30962,19 +30915,12 @@ __nccwpck_require__.r(__webpack_exports__);
 const { throttling } = __nccwpck_require__(9968);
 const { retry } = __nccwpck_require__(6298);
 const { Octokit } = __nccwpck_require__(6762);
-const {
-  restEndpointMethods,
-} = __nccwpck_require__(3044);
+const { restEndpointMethods } = __nccwpck_require__(3044);
 const { paginateRest } = __nccwpck_require__(4193);
 
-const RetryThrottlingOctokit = Octokit.plugin(
-  throttling,
-  retry,
-  restEndpointMethods,
-  paginateRest
-);
+const RetryThrottlingOctokit = Octokit.plugin(throttling, retry, restEndpointMethods, paginateRest);
 
-const CreateGithubClient = (token, maxRetries = 3) => {
+function CreateGithubClient(token, maxRetries) {
   const MAX_RETRIES = maxRetries ? maxRetries : 3;
 
   const octokit = new RetryThrottlingOctokit({
@@ -30982,12 +30928,8 @@ const CreateGithubClient = (token, maxRetries = 3) => {
 
     throttle: {
       onRateLimit: (retryAfter, options) => {
-        octokit.log.warn(
-          `Request quota exhausted for request ${options.method} ${options.url}`
-        );
-        octokit.log.warn(
-          `  request retries: ${options.request.retryCount}, MAX: ${MAX_RETRIES}`
-        );
+        octokit.log.warn(`Request quota exhausted for request ${options.method} ${options.url}`);
+        octokit.log.warn(`  request retries: ${options.request.retryCount}, MAX: ${MAX_RETRIES}`);
 
         if (options.request.retryCount < MAX_RETRIES) {
           octokit.log.warn(`Retrying after ${retryAfter} seconds.`);
@@ -30997,20 +30939,63 @@ const CreateGithubClient = (token, maxRetries = 3) => {
       onSecondaryRateLimit: (retryAfter, options, octokit) => {
         // does not retry, only logs a warning
         octokit.log.warn(
-          `SecondaryRateLimit detected for request ${options.method} ${options.url}`
+          `SecondaryRateLimit detected for request ${options.method} ${options.url}`,
         );
       },
       onAbuseLimit: (retryAfter, options) => {
-        octokit.log.warn(
-          `Abuse detection triggered request ${options.method} ${options.url}`
-        );
+        octokit.log.warn(`Abuse detection triggered request ${options.method} ${options.url}`);
         return false;
       },
     },
   });
 
   return octokit;
-};
+}
+
+
+/***/ }),
+
+/***/ 2980:
+/***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
+
+"use strict";
+__nccwpck_require__.r(__webpack_exports__);
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   "IpAllowListEntry": () => (/* binding */ IpAllowListEntry)
+/* harmony export */ });
+class IpAllowListEntry {
+  constructor({ name, allowListValue, isActive, createdAt, updatedAt }) {
+    this._name = name;
+    this._allowListValue = allowListValue;
+    this._isActive = isActive;
+    this._createdAt = createdAt;
+    this._updatedAt = updatedAt;
+  }
+
+  get name() {
+    return this._name;
+  }
+
+  get cidr() {
+    return this._allowListValue;
+  }
+
+  get allowListValue() {
+    return this._allowListValue;
+  }
+
+  get isActive() {
+    return this._isActive;
+  }
+
+  get createdAt() {
+    return this._createdAt;
+  }
+
+  get updatedAt() {
+    return this._updatedAt;
+  }
+}
 
 
 /***/ }),
@@ -31035,11 +31020,10 @@ const { Octokit } = __nccwpck_require__(5375);
 async function getMetaCIDRs({ metadataKey }) {
   const octokitRest = new Octokit();
   const { data: metadata } = await octokitRest.rest.meta.get();
-  core.info(`metadataKey: ${metadataKey}`);
-  core.info(
+  core.debug(
     `Get https://api.github.com/meta GitHub Meta API CIDRs, ${JSON.stringify(
-      metadata[metadataKey]
-    )}`
+      metadata[metadataKey],
+    )}`,
   );
   return metadata[metadataKey];
 }
@@ -31049,10 +31033,10 @@ async function getMetaCidrEntries({ metadataKey }) {
   const cidrEntries = cidrs.map(
     (cidr) =>
       new CidrEntry({
-        name: "@scope made by github action",
+        name: '@scope made by github action',
         cidr,
         isActive: true,
-      })
+      }),
   );
   core.debug(`getMetaCidrEntries: ${JSON.stringify(cidrEntries)}`);
   return cidrEntries;
@@ -31063,9 +31047,7 @@ function getAdditionalCidrEntries(value) {
   try {
     const parsedCidrEntries = YAML.parse(value);
     core.debug(`yaml parse: ${JSON.stringify(parsedCidrEntries)}`);
-    cidrEntries = parsedCidrEntries.map(
-      (cidrEntry) => new CidrEntry(cidrEntry)
-    );
+    cidrEntries = parsedCidrEntries.map((cidrEntry) => new CidrEntry(cidrEntry));
     core.debug(`getAdditionalCidrEntries: ${JSON.stringify(cidrEntries)}`);
   } catch (err) {
     throw new Error(`additionalCidrEntries yaml string cannot parse ${err}`);
@@ -31079,11 +31061,9 @@ function getToDeleteIpAllowListEntries({
 }) {
   // find set existScopedIpAllowListEntries - expectCidrEntries
   const expectCidrs = expectCidrEntries.map((cidrEntry) => cidrEntry.cidr);
-  const toDeleteIpAllowListEntries = existScopedIpAllowListEntries.filter(
-    (scoped) => {
-      expectCidrs.indexOf(scoped.cidr) === -1; // find only exist in existScopedIpAllowListEntries
-    }
-  );
+  const toDeleteIpAllowListEntries = existScopedIpAllowListEntries.filter((scoped) => {
+    expectCidrs.indexOf(scoped.cidr) === -1; // find only exist in existScopedIpAllowListEntries
+  });
   return toDeleteIpAllowListEntries;
 }
 
@@ -31092,9 +31072,7 @@ function getToCreateIpAllowListEntries({
   expectCidrEntries,
 }) {
   // find set expectCidrEntries -   existScopedIpAllowListEntries
-  const existCidrs = existScopedIpAllowListEntries.map(
-    (ipAllowListEntry) => ipAllowListEntry.cidr
-  );
+  const existCidrs = existScopedIpAllowListEntries.map((ipAllowListEntry) => ipAllowListEntry.cidr);
   const toCreateIpAllowListEntries = expectCidrEntries.filter((expect) => {
     existCidrs.indexOf(expect.cidr) === -1; // find only exist in   expectCidrEntries
   });
@@ -31106,16 +31084,15 @@ function getToUpdateIpAllowListEntries({
   expectCidrEntries,
 }) {
   const expectCidrs = expectCidrEntries.map((cidrEntry) => cidrEntry.cidr);
-  const candidateToUpdateIpAllowListEntries =
-    existScopedIpAllowListEntries.filter((scoped) => {
-      expectCidrs.indexOf(scoped.cidr) > -1; // find only two sections
-    });
+  const candidateToUpdateIpAllowListEntries = existScopedIpAllowListEntries.filter((scoped) => {
+    expectCidrs.indexOf(scoped.cidr) > -1; // find only two sections
+  });
 
   const toUpdateIpAllowListEntries = candidateToUpdateIpAllowListEntries.filter(
     (candidateToUpdateIpAllowListEntry) => {
       // TODO extract need to update entries
       return true;
-    }
+    },
   );
   return toUpdateIpAllowListEntries;
 }
@@ -41462,33 +41439,30 @@ const core = __nccwpck_require__(2186);
 
 const { CreateGithubClient } = __nccwpck_require__(2504);
 
-const {
-  GetEnterpriseScopedIpAllowListEntriesCommand,
-} = __nccwpck_require__(8455);
+const { GetEnterpriseScopedIpAllowListEntriesCommand } = __nccwpck_require__(7587);
 
 const {
   getMetaCidrEntries,
   getAdditionalCidrEntries,
   getToDeleteIpAllowListEntries,
   getToCreateIpAllowListEntries,
+  getToUpdateIpAllowListEntries,
 } = __nccwpck_require__(6254);
 
 const expectCidrEntries = [];
 
 async function run() {
   try {
-    const githubToken = core.getInput("github_token", { required: true });
-    const enterpriseSlug = core.getInput("enterprise_slug", { required: true });
-    const metadataKey = core.getInput("metadata_key");
-    const additionalCidrEntries = core.getInput("additional_cidr_entries");
-    const scope = core.getInput("scope");
+    const githubToken = core.getInput('github_token', { required: true });
+    const enterpriseSlug = core.getInput('enterprise_slug', { required: true });
+    const metadataKey = core.getInput('metadata_key');
+    const additionalCidrEntries = core.getInput('additional_cidr_entries');
+    const scope = core.getInput('scope');
 
     const octokit = CreateGithubClient(githubToken);
 
     if (!metadataKey && !additionalCidrEntries) {
-      throw new Error(
-        "A set of additionalCidrEntries or GitHub metadataKey must be specified."
-      );
+      throw new Error('A set of additionalCidrEntries or GitHub metadataKey must be specified.');
     }
 
     const { enterprise, ipAllowListEntries: existScopedIpAllowListEntries } =
@@ -41504,7 +41478,7 @@ async function run() {
         expectCidrEntries.push(cidrEntries);
       } else {
         throw new Error(
-          `The metadata cidrEntries for '${metadataKey}' were unable to be resolved.`
+          `The metadata cidrEntries for '${metadataKey}' were unable to be resolved.`,
         );
       }
     }
@@ -41513,13 +41487,13 @@ async function run() {
       expectCidrEntries.push(cidrEntries);
     }
 
-    const toDelete = getToCreateIpAllowListEntries({
+    const toDelete = getToDeleteIpAllowListEntries({
       existScopedIpAllowListEntries,
       expectCidrEntries,
     });
     core.info(`toDelete: ${JSON.stringify(toDelete)}`);
 
-    const toCreate = getToDeleteIpAllowListEntries({
+    const toCreate = getToCreateIpAllowListEntries({
       existScopedIpAllowListEntries,
       expectCidrEntries,
     });
