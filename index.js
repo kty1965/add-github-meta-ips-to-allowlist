@@ -50,6 +50,9 @@ async function run() {
       expectCidrEntries.push(cidrEntries);
     }
 
+    core.debug(`existScopedIpAllowListEntries: ${JSON.stringify(existScopedIpAllowListEntries)}`);
+    core.debug(`expectCidrEntries: ${JSON.stringify(expectCidrEntries)}`);
+
     const toDelete = getToDeleteIpAllowListEntries({
       existScopedIpAllowListEntries,
       expectCidrEntries,
