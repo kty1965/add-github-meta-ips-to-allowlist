@@ -31061,6 +31061,7 @@ function getToDeleteIpAllowListEntries({
 }) {
   // find set existScopedIpAllowListEntries - expectCidrEntries
   const expectCidrs = expectCidrEntries.map((cidrEntry) => cidrEntry.cidr);
+  core.info(`getToDeleteIpAllowListEntries.expectCidrs: ${JSON.stringify(expectCidrs)}`);
   const toDeleteIpAllowListEntries = existScopedIpAllowListEntries.filter((scoped) => {
     return expectCidrs.indexOf(scoped.cidr) === -1; // find only exist in existScopedIpAllowListEntries
   });
@@ -31073,6 +31074,7 @@ function getToCreateIpAllowListEntries({
 }) {
   // find set expectCidrEntries -   existScopedIpAllowListEntries
   const existCidrs = existScopedIpAllowListEntries.map((ipAllowListEntry) => ipAllowListEntry.cidr);
+  core.info(`getToCreateIpAllowListEntries.existCidrs: ${JSON.stringify(existCidrs)}`);
   const toCreateIpAllowListEntries = expectCidrEntries.filter((expect) => {
     return existCidrs.indexOf(expect.cidr) === -1; // find only exist in   expectCidrEntries
   });
@@ -31084,6 +31086,7 @@ function getToUpdateIpAllowListEntries({
   expectCidrEntries,
 }) {
   const expectCidrs = expectCidrEntries.map((cidrEntry) => cidrEntry.cidr);
+  core.info(`getToUpdateIpAllowListEntries.expectCidrs: ${JSON.stringify(expectCidrs)}`);
   const candidateToUpdateIpAllowListEntries = existScopedIpAllowListEntries.filter((scoped) => {
     return expectCidrs.indexOf(scoped.cidr) > -1; // find only two sections
   });
