@@ -30580,21 +30580,21 @@ __nccwpck_require__.r(__webpack_exports__);
 /* harmony export */ });
 class CidrEntry {
   constructor({ name, cidr, isActive = true }) {
-    this.name = name;
-    this.cidr = cidr;
-    this.isActive = isActive;
+    this._name = name;
+    this._cidr = cidr;
+    this._isActive = isActive;
   }
 
   get name() {
-    return this.name;
+    return this._name;
   }
 
   get cidr() {
-    return this.cidr;
+    return this._cidr;
   }
 
   get isActive() {
-    return this.isActive;
+    return this._isActive;
   }
 }
 
@@ -41057,6 +41057,7 @@ async function getMetaCIDRs(octokit, name) {
 function getCidrs(value) {
   try {
     const cidrEntries = YAML.parse(value);
+    core.info(JSON.stringify(cidrEntries));
     const result = cidrEntries.map((cidrEntry) => new CidrEntry(cidrEntry));
   } catch (err) {
     throw new Error(`additionalCidrEntries yaml string cannot parse ${err}`);

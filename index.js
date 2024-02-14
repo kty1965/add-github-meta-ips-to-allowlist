@@ -55,6 +55,7 @@ async function getMetaCIDRs(octokit, name) {
 function getCidrs(value) {
   try {
     const cidrEntries = YAML.parse(value);
+    core.info(JSON.stringify(cidrEntries));
     const result = cidrEntries.map((cidrEntry) => new CidrEntry(cidrEntry));
   } catch (err) {
     throw new Error(`additionalCidrEntries yaml string cannot parse ${err}`);
