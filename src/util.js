@@ -5,13 +5,13 @@ const { Octokit } = require("@octokit/rest");
 async function getMetaCIDRs({ metadataKey }) {
   const octokitRest = new Octokit();
   core.info(`${JSON.stringify(octokitRest)}`);
-  const results = await octokitRest.rest.meta.get();
+  const { data: metadata } = await octokitRest.rest.meta.get();
   core.info(
-    `Get https://api.github.com/meta GitHub Meta API CIDRs, ${JSON.stringify(
-      results
-    )}`
+    `Get https://api.github.com/meta GitHub Meta API CIDRs, ${JSON.stringify({
+      metadata,
+    })}`
   );
-  return results.data[metadataKey];
+  return metadata[metadataKey];
 }
 
 export async function getMetaCidrEntries({ octokit, metadataKey }) {
