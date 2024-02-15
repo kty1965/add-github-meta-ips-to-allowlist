@@ -54,19 +54,16 @@ export function getToDeleteIpAllowListEntries({
   existScopedIpAllowListEntries,
   expectCidrEntries,
 }) {
+  core.startGroup('getToDeleteIpAllowListEntries');
   // find set existScopedIpAllowListEntries - expectCidrEntries
   const groupByCidrOnExpectCidrEntries = _.groupBy(expectCidrEntries, 'cidr');
   const groupByCidrOnExistScopedIpAllowListEntries = _.groupBy(
     existScopedIpAllowListEntries,
     'cidr',
   );
+  core.debug(`groupByCidrOnExpectCidrEntries: ${JSON.stringify(groupByCidrOnExpectCidrEntries)}`);
   core.debug(
-    `getToDeleteIpAllowListEntries.groupByCidrOnExpectCidrEntries: ${JSON.stringify(
-      groupByCidrOnExpectCidrEntries,
-    )}`,
-  );
-  core.debug(
-    `getToDeleteIpAllowListEntries.groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
+    `groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
       groupByCidrOnExistScopedIpAllowListEntries,
     )}`,
   );
@@ -75,7 +72,8 @@ export function getToDeleteIpAllowListEntries({
     _.keys(groupByCidrOnExistScopedIpAllowListEntries),
     _.keys(groupByCidrOnExpectCidrEntries),
   );
-  core.debug(`getToDeleteIpAllowListEntries.toDeleteCidrs: ${JSON.stringify(toDeleteCidrs)}`);
+  core.debug(`toDeleteCidrs: ${JSON.stringify(toDeleteCidrs)}`);
+  core.endGroup();
 
   const toDeleteIpAllowListEntries = toDeleteCidrs.map((cidr) => {
     return groupByCidrOnExistScopedIpAllowListEntries[cidr][0];
@@ -88,6 +86,7 @@ export function getToCreateIpAllowListEntries({
   existScopedIpAllowListEntries,
   expectCidrEntries,
 }) {
+  core.startGroup('getToCreateIpAllowListEntries');
   // find set expectCidrEntries -   existScopedIpAllowListEntries
   const groupByCidrOnExpectCidrEntries = _.groupBy(expectCidrEntries, 'cidr');
   const groupByCidrOnExistScopedIpAllowListEntries = _.groupBy(
@@ -95,13 +94,9 @@ export function getToCreateIpAllowListEntries({
     'cidr',
   );
 
+  core.debug(`groupByCidrOnExpectCidrEntries: ${JSON.stringify(groupByCidrOnExpectCidrEntries)}`);
   core.debug(
-    `getToCreateIpAllowListEntries.groupByCidrOnExpectCidrEntries: ${JSON.stringify(
-      groupByCidrOnExpectCidrEntries,
-    )}`,
-  );
-  core.debug(
-    `getToCreateIpAllowListEntries.groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
+    `groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
       groupByCidrOnExistScopedIpAllowListEntries,
     )}`,
   );
@@ -110,7 +105,8 @@ export function getToCreateIpAllowListEntries({
     _.keys(groupByCidrOnExpectCidrEntries),
     _.keys(groupByCidrOnExistScopedIpAllowListEntries),
   );
-  core.debug(`getToCreateIpAllowListEntries.toCreateCidrs: ${JSON.stringify(toCreateCidrs)}`);
+  core.debug(`toCreateCidrs: ${JSON.stringify(toCreateCidrs)}`);
+  core.endGroup();
 
   const toCreateIpAllowListEntries = toCreateCidrs.map((cidr) => {
     return groupByCidrOnExpectCidrEntries[cidr][0];
@@ -122,19 +118,16 @@ export function getToUpdateIpAllowListEntries({
   existScopedIpAllowListEntries,
   expectCidrEntries,
 }) {
+  core.startGroup('getToUpdateIpAllowListEntries');
   const groupByCidrOnExpectCidrEntries = _.groupBy(expectCidrEntries, 'cidr');
   const groupByCidrOnExistScopedIpAllowListEntries = _.groupBy(
     existScopedIpAllowListEntries,
     'cidr',
   );
 
+  core.debug(`groupByCidrOnExpectCidrEntries: ${JSON.stringify(groupByCidrOnExpectCidrEntries)}`);
   core.debug(
-    `getToUpdateIpAllowListEntries.groupByCidrOnExpectCidrEntries: ${JSON.stringify(
-      groupByCidrOnExpectCidrEntries,
-    )}`,
-  );
-  core.debug(
-    `getToUpdateIpAllowListEntries.groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
+    `groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
       groupByCidrOnExistScopedIpAllowListEntries,
     )}`,
   );
@@ -156,10 +149,11 @@ export function getToUpdateIpAllowListEntries({
     });
 
   core.debug(
-    `getToUpdateIpAllowListEntries.toUpdateTupleCidrEntryWithIpAllowListEntry: ${JSON.stringify(
+    `toUpdateTupleCidrEntryWithIpAllowListEntry: ${JSON.stringify(
       toUpdateTupleCidrEntryWithIpAllowListEntry,
     )}`,
   );
+  core.endGroup();
 
   return toUpdateTupleCidrEntryWithIpAllowListEntry;
 }

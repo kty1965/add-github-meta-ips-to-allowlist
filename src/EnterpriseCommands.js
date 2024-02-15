@@ -17,16 +17,16 @@ export async function GetEnterpriseScopedIpAllowListEntriesCommand({
     octokit,
   });
 
+  core.startGroup('GetEnterpriseScopedIpAllowListEntriesCommand');
   core.debug(`enterprise: ${JSON.stringify(enterprise)}`);
-  core.debug(`ipAllowListEntries last(10): ${JSON.stringify(ipAllowListEntries.slice(-10))}`);
+  core.debug(`number of ipAllowListEntries: ${ipAllowListEntries.length}`);
   const scopedIpAllowListEntries = ipAllowListEntries.filter((IpAllowListEntry) =>
     IpAllowListEntry.name.startsWith(scope),
   );
   core.debug(
-    `scopedIpAllowListEntries last(10): ${JSON.stringify(
-      scopedIpAllowListEntries.slice(-10),
-    )}, scope: ${scope}`,
+    `number of scopedIpAllowListEntries: ${scopedIpAllowListEntries.length}, scope: ${scope}`,
   );
+  core.endGroup();
 
   return {
     enterprise,
@@ -35,6 +35,7 @@ export async function GetEnterpriseScopedIpAllowListEntriesCommand({
 }
 
 export async function GetEnterpriseCommand({ enterpriseSlug, octokit }) {
+  core.startGroup('GetEnterpriseCommand');
   const queryResult = await octokit.graphql({
     query: `
     query getEnterprise($enterpriseSlug: String!) {
@@ -49,7 +50,8 @@ export async function GetEnterpriseCommand({ enterpriseSlug, octokit }) {
     `,
     enterpriseSlug,
   });
-
+  core.debug(`GetEnterpriseCommand ${JSON.stringify(queryResult)}`);
+  core.endGroup();
   return new Enterprise(queryResult.enterprise);
 }
 
@@ -133,13 +135,12 @@ function getObject(target, ...path) {
 
 export async function CreateIpAllowListEntryCommand({ octokit, ownerId, cidrEntry }) {
   const { name, cidr, isActive } = cidrEntry;
-  core.startGroup(`create cidr: ${cidr}`);
+  core.startGroup(`CreateIpAllowListEntryCommand ${cidr}`);
   core.info(`parameters`);
   core.info(`  owner:  ${ownerId}`);
   core.info(`   name:  ${name}`);
   core.info(`   cidr:  ${cidr}`);
   core.info(` active:  ${!!isActive}`);
-  core.endGroup();
 
   const createdIpAllowList = await octokit.graphql({
     query: `
@@ -167,18 +168,19 @@ export async function CreateIpAllowListEntryCommand({ octokit, ownerId, cidrEntr
     cidr: cidr,
     isActive: !!isActive,
   });
+  core.debug(`${JSON.stringify(createdIpAllowList)}`);
+  core.endGroup();
   return new IpAllowListEntry(createdIpAllowList);
 }
 
 export async function UpdateIpAllowListEntryCommand({ octokit, ipAllowListEntry }) {
   const { id, name, cidr, allowListValue, isActive } = ipAllowListEntry;
-  core.startGroup(`update cidr: ${cidr}`);
+  core.startGroup(`UpdateIpAllowListEntryCommand ${cidr}`);
   core.info(`parameters`);
   core.info(`     id:  ${id}`);
   core.info(`   name:  ${name}`);
   core.info(`   cidr:  ${cidr}`);
   core.info(` isActive:  ${isActive}`);
-  core.endGroup();
 
   const updatedIpAllowList = await octokit.graphql({
     query: `
@@ -206,16 +208,17 @@ export async function UpdateIpAllowListEntryCommand({ octokit, ipAllowListEntry 
     cidr: cidr,
     isActive: isActive,
   });
+  core.debug(`${JSON.stringify(updatedIpAllowList)}`);
+  core.endGroup();
   return new IpAllowListEntry(updatedIpAllowList);
 }
 
 export async function DeleteIpAllowListEntryCommand({ octokit, ipAllowListEntry }) {
   const { id, cidr, name } = ipAllowListEntry;
-  core.startGroup(`delete cidr: ${cidr}`);
+  core.startGroup(`DeleteIpAllowListEntryCommand ${cidr}`);
   core.info(`parameters`);
   core.info(`  id:   ${id}`);
   core.info(`  name: ${name}`);
-  core.endGroup();
 
   const deletedIpAllowList = await octokit.graphql({
     query: `
@@ -237,5 +240,7 @@ export async function DeleteIpAllowListEntryCommand({ octokit, ipAllowListEntry 
     `,
     id,
   });
+  core.debug(`${JSON.stringify(deletedIpAllowList)}`);
+  core.endGroup();
   return new IpAllowListEntry(deletedIpAllowList);
 }

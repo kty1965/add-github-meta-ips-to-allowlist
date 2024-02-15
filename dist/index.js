@@ -33599,16 +33599,16 @@ async function GetEnterpriseScopedIpAllowListEntriesCommand({
     octokit,
   });
 
+  core.startGroup('GetEnterpriseScopedIpAllowListEntriesCommand');
   core.debug(`enterprise: ${JSON.stringify(enterprise)}`);
-  core.debug(`ipAllowListEntries last(10): ${JSON.stringify(ipAllowListEntries.slice(-10))}`);
+  core.debug(`number of ipAllowListEntries: ${ipAllowListEntries.length}`);
   const scopedIpAllowListEntries = ipAllowListEntries.filter((IpAllowListEntry) =>
     IpAllowListEntry.name.startsWith(scope),
   );
   core.debug(
-    `scopedIpAllowListEntries last(10): ${JSON.stringify(
-      scopedIpAllowListEntries.slice(-10),
-    )}, scope: ${scope}`,
+    `number of scopedIpAllowListEntries: ${scopedIpAllowListEntries.length}, scope: ${scope}`,
   );
+  core.endGroup();
 
   return {
     enterprise,
@@ -33617,6 +33617,7 @@ async function GetEnterpriseScopedIpAllowListEntriesCommand({
 }
 
 async function GetEnterpriseCommand({ enterpriseSlug, octokit }) {
+  core.startGroup('GetEnterpriseCommand');
   const queryResult = await octokit.graphql({
     query: `
     query getEnterprise($enterpriseSlug: String!) {
@@ -33631,7 +33632,8 @@ async function GetEnterpriseCommand({ enterpriseSlug, octokit }) {
     `,
     enterpriseSlug,
   });
-
+  core.debug(`GetEnterpriseCommand ${JSON.stringify(queryResult)}`);
+  core.endGroup();
   return new Enterprise(queryResult.enterprise);
 }
 
@@ -33715,13 +33717,12 @@ function getObject(target, ...path) {
 
 async function CreateIpAllowListEntryCommand({ octokit, ownerId, cidrEntry }) {
   const { name, cidr, isActive } = cidrEntry;
-  core.startGroup(`create cidr: ${cidr}`);
+  core.startGroup(`CreateIpAllowListEntryCommand ${cidr}`);
   core.info(`parameters`);
   core.info(`  owner:  ${ownerId}`);
   core.info(`   name:  ${name}`);
   core.info(`   cidr:  ${cidr}`);
   core.info(` active:  ${!!isActive}`);
-  core.endGroup();
 
   const createdIpAllowList = await octokit.graphql({
     query: `
@@ -33749,18 +33750,19 @@ async function CreateIpAllowListEntryCommand({ octokit, ownerId, cidrEntry }) {
     cidr: cidr,
     isActive: !!isActive,
   });
+  core.debug(`${JSON.stringify(createdIpAllowList)}`);
+  core.endGroup();
   return new IpAllowListEntry(createdIpAllowList);
 }
 
 async function UpdateIpAllowListEntryCommand({ octokit, ipAllowListEntry }) {
   const { id, name, cidr, allowListValue, isActive } = ipAllowListEntry;
-  core.startGroup(`update cidr: ${cidr}`);
+  core.startGroup(`UpdateIpAllowListEntryCommand ${cidr}`);
   core.info(`parameters`);
   core.info(`     id:  ${id}`);
   core.info(`   name:  ${name}`);
   core.info(`   cidr:  ${cidr}`);
   core.info(` isActive:  ${isActive}`);
-  core.endGroup();
 
   const updatedIpAllowList = await octokit.graphql({
     query: `
@@ -33788,16 +33790,17 @@ async function UpdateIpAllowListEntryCommand({ octokit, ipAllowListEntry }) {
     cidr: cidr,
     isActive: isActive,
   });
+  core.debug(`${JSON.stringify(updatedIpAllowList)}`);
+  core.endGroup();
   return new IpAllowListEntry(updatedIpAllowList);
 }
 
 async function DeleteIpAllowListEntryCommand({ octokit, ipAllowListEntry }) {
   const { id, cidr, name } = ipAllowListEntry;
-  core.startGroup(`delete cidr: ${cidr}`);
+  core.startGroup(`DeleteIpAllowListEntryCommand ${cidr}`);
   core.info(`parameters`);
   core.info(`  id:   ${id}`);
   core.info(`  name: ${name}`);
-  core.endGroup();
 
   const deletedIpAllowList = await octokit.graphql({
     query: `
@@ -33819,6 +33822,8 @@ async function DeleteIpAllowListEntryCommand({ octokit, ipAllowListEntry }) {
     `,
     id,
   });
+  core.debug(`${JSON.stringify(deletedIpAllowList)}`);
+  core.endGroup();
   return new IpAllowListEntry(deletedIpAllowList);
 }
 
@@ -34094,19 +34099,16 @@ function getToDeleteIpAllowListEntries({
   existScopedIpAllowListEntries,
   expectCidrEntries,
 }) {
+  core.startGroup('getToDeleteIpAllowListEntries');
   // find set existScopedIpAllowListEntries - expectCidrEntries
   const groupByCidrOnExpectCidrEntries = _.groupBy(expectCidrEntries, 'cidr');
   const groupByCidrOnExistScopedIpAllowListEntries = _.groupBy(
     existScopedIpAllowListEntries,
     'cidr',
   );
+  core.debug(`groupByCidrOnExpectCidrEntries: ${JSON.stringify(groupByCidrOnExpectCidrEntries)}`);
   core.debug(
-    `getToDeleteIpAllowListEntries.groupByCidrOnExpectCidrEntries: ${JSON.stringify(
-      groupByCidrOnExpectCidrEntries,
-    )}`,
-  );
-  core.debug(
-    `getToDeleteIpAllowListEntries.groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
+    `groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
       groupByCidrOnExistScopedIpAllowListEntries,
     )}`,
   );
@@ -34115,7 +34117,8 @@ function getToDeleteIpAllowListEntries({
     _.keys(groupByCidrOnExistScopedIpAllowListEntries),
     _.keys(groupByCidrOnExpectCidrEntries),
   );
-  core.debug(`getToDeleteIpAllowListEntries.toDeleteCidrs: ${JSON.stringify(toDeleteCidrs)}`);
+  core.debug(`toDeleteCidrs: ${JSON.stringify(toDeleteCidrs)}`);
+  core.endGroup();
 
   const toDeleteIpAllowListEntries = toDeleteCidrs.map((cidr) => {
     return groupByCidrOnExistScopedIpAllowListEntries[cidr][0];
@@ -34128,6 +34131,7 @@ function getToCreateIpAllowListEntries({
   existScopedIpAllowListEntries,
   expectCidrEntries,
 }) {
+  core.startGroup('getToCreateIpAllowListEntries');
   // find set expectCidrEntries -   existScopedIpAllowListEntries
   const groupByCidrOnExpectCidrEntries = _.groupBy(expectCidrEntries, 'cidr');
   const groupByCidrOnExistScopedIpAllowListEntries = _.groupBy(
@@ -34135,13 +34139,9 @@ function getToCreateIpAllowListEntries({
     'cidr',
   );
 
+  core.debug(`groupByCidrOnExpectCidrEntries: ${JSON.stringify(groupByCidrOnExpectCidrEntries)}`);
   core.debug(
-    `getToCreateIpAllowListEntries.groupByCidrOnExpectCidrEntries: ${JSON.stringify(
-      groupByCidrOnExpectCidrEntries,
-    )}`,
-  );
-  core.debug(
-    `getToCreateIpAllowListEntries.groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
+    `groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
       groupByCidrOnExistScopedIpAllowListEntries,
     )}`,
   );
@@ -34150,7 +34150,8 @@ function getToCreateIpAllowListEntries({
     _.keys(groupByCidrOnExpectCidrEntries),
     _.keys(groupByCidrOnExistScopedIpAllowListEntries),
   );
-  core.debug(`getToCreateIpAllowListEntries.toCreateCidrs: ${JSON.stringify(toCreateCidrs)}`);
+  core.debug(`toCreateCidrs: ${JSON.stringify(toCreateCidrs)}`);
+  core.endGroup();
 
   const toCreateIpAllowListEntries = toCreateCidrs.map((cidr) => {
     return groupByCidrOnExpectCidrEntries[cidr][0];
@@ -34162,19 +34163,16 @@ function getToUpdateIpAllowListEntries({
   existScopedIpAllowListEntries,
   expectCidrEntries,
 }) {
+  core.startGroup('getToUpdateIpAllowListEntries');
   const groupByCidrOnExpectCidrEntries = _.groupBy(expectCidrEntries, 'cidr');
   const groupByCidrOnExistScopedIpAllowListEntries = _.groupBy(
     existScopedIpAllowListEntries,
     'cidr',
   );
 
+  core.debug(`groupByCidrOnExpectCidrEntries: ${JSON.stringify(groupByCidrOnExpectCidrEntries)}`);
   core.debug(
-    `getToUpdateIpAllowListEntries.groupByCidrOnExpectCidrEntries: ${JSON.stringify(
-      groupByCidrOnExpectCidrEntries,
-    )}`,
-  );
-  core.debug(
-    `getToUpdateIpAllowListEntries.groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
+    `groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
       groupByCidrOnExistScopedIpAllowListEntries,
     )}`,
   );
@@ -34196,10 +34194,11 @@ function getToUpdateIpAllowListEntries({
     });
 
   core.debug(
-    `getToUpdateIpAllowListEntries.toUpdateTupleCidrEntryWithIpAllowListEntry: ${JSON.stringify(
+    `toUpdateTupleCidrEntryWithIpAllowListEntry: ${JSON.stringify(
       toUpdateTupleCidrEntryWithIpAllowListEntry,
     )}`,
   );
+  core.endGroup();
 
   return toUpdateTupleCidrEntryWithIpAllowListEntry;
 }
@@ -46831,9 +46830,10 @@ async function run() {
       expectCidrEntries.push(...cidrEntries);
     }
 
-    core.debug(`existScopedIpAllowListEntries: ${JSON.stringify(existScopedIpAllowListEntries)}`);
-    core.debug(`expectCidrEntries: ${JSON.stringify(expectCidrEntries)}`);
+    core.info(`number of existScopedIpAllowListEntries: ${existScopedIpAllowListEntries.length}`);
+    core.info(`number of expectCidrEntries: ${expectCidrEntries.length}`);
 
+    core.startGroup(`Delete IpAllowListEntries`);
     const toDelete = getToDeleteIpAllowListEntries({
       existScopedIpAllowListEntries,
       expectCidrEntries,
@@ -46842,9 +46842,11 @@ async function run() {
       ipAllowListEntries: toDelete,
       octokit,
     });
-    core.info(`toDelete: ${JSON.stringify(toDelete)}`);
-    core.info(`toDeleteResult: ${JSON.stringify(toDeleteResult)}`);
+    core.info(`number of toDelete: ${toDelete.length}`);
+    core.info(`number of toDeleteResult: ${toDeleteResult.length}`);
+    core.endGroup();
 
+    core.startGroup(`Create IpAllowListEntries`);
     const toCreate = getToCreateIpAllowListEntries({
       existScopedIpAllowListEntries,
       expectCidrEntries,
@@ -46854,9 +46856,11 @@ async function run() {
       cidrEntries: toCreate,
       octokit,
     });
-    core.info(`toCreate: ${JSON.stringify(toCreate)}`);
-    core.info(`toCreateResult: ${JSON.stringify(toCreateResult)}`);
+    core.info(`number of toCreate: ${toCreate.length}`);
+    core.info(`number of toCreateResult: ${toCreateResult.length}`);
+    core.endGroup();
 
+    core.startGroup(`Update IpAllowListEntries`);
     const toUpdateMergedIpAllowListEntries = getToUpdateIpAllowListEntries({
       existScopedIpAllowListEntries,
       expectCidrEntries,
@@ -46871,8 +46875,9 @@ async function run() {
       ipAllowListEntries: toUpdateMergedIpAllowListEntries,
       octokit,
     });
-    core.info(`toUpdate: ${JSON.stringify(toUpdateMergedIpAllowListEntries)}`);
-    core.info(`toUpdateResult: ${JSON.stringify(toUpdateResult)}`);
+    core.info(`number of toUpdate: ${toUpdateMergedIpAllowListEntries.length}`);
+    core.info(`number of toUpdateResult: ${toUpdateResult.length}`);
+    core.endGroup();
   } catch (err) {
     core.setFailed(err);
   }

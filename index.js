@@ -54,9 +54,10 @@ async function run() {
       expectCidrEntries.push(...cidrEntries);
     }
 
-    core.debug(`existScopedIpAllowListEntries: ${JSON.stringify(existScopedIpAllowListEntries)}`);
-    core.debug(`expectCidrEntries: ${JSON.stringify(expectCidrEntries)}`);
+    core.info(`number of existScopedIpAllowListEntries: ${existScopedIpAllowListEntries.length}`);
+    core.info(`number of expectCidrEntries: ${expectCidrEntries.length}`);
 
+    core.startGroup(`Delete IpAllowListEntries`);
     const toDelete = getToDeleteIpAllowListEntries({
       existScopedIpAllowListEntries,
       expectCidrEntries,
@@ -65,9 +66,11 @@ async function run() {
       ipAllowListEntries: toDelete,
       octokit,
     });
-    core.info(`toDelete: ${JSON.stringify(toDelete)}`);
-    core.info(`toDeleteResult: ${JSON.stringify(toDeleteResult)}`);
+    core.info(`number of toDelete: ${toDelete.length}`);
+    core.info(`number of toDeleteResult: ${toDeleteResult.length}`);
+    core.endGroup();
 
+    core.startGroup(`Create IpAllowListEntries`);
     const toCreate = getToCreateIpAllowListEntries({
       existScopedIpAllowListEntries,
       expectCidrEntries,
@@ -77,9 +80,11 @@ async function run() {
       cidrEntries: toCreate,
       octokit,
     });
-    core.info(`toCreate: ${JSON.stringify(toCreate)}`);
-    core.info(`toCreateResult: ${JSON.stringify(toCreateResult)}`);
+    core.info(`number of toCreate: ${toCreate.length}`);
+    core.info(`number of toCreateResult: ${toCreateResult.length}`);
+    core.endGroup();
 
+    core.startGroup(`Update IpAllowListEntries`);
     const toUpdateMergedIpAllowListEntries = getToUpdateIpAllowListEntries({
       existScopedIpAllowListEntries,
       expectCidrEntries,
@@ -94,8 +99,9 @@ async function run() {
       ipAllowListEntries: toUpdateMergedIpAllowListEntries,
       octokit,
     });
-    core.info(`toUpdate: ${JSON.stringify(toUpdateMergedIpAllowListEntries)}`);
-    core.info(`toUpdateResult: ${JSON.stringify(toUpdateResult)}`);
+    core.info(`number of toUpdate: ${toUpdateMergedIpAllowListEntries.length}`);
+    core.info(`number of toUpdateResult: ${toUpdateResult.length}`);
+    core.endGroup();
   } catch (err) {
     core.setFailed(err);
   }
