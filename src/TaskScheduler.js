@@ -1,3 +1,5 @@
+const Bottleneck = require('bottleneck');
+
 class TaskScheduler {
   constructor() {
     this._limiter = new Bottleneck({
