@@ -1,9 +1,10 @@
 const core = require('@actions/core');
 const YAML = require('yaml');
 const { CidrEntry } = require('./models/CidrEntry');
-const TaskScheduler = require('./TaskScheduler');
+const Bottleneck = require('bottleneck');
 const { Octokit } = require('@octokit/rest');
 const _ = require('underscore');
+const { env } = require('./env');
 
 const {
   CreateIpAllowListEntryCommand,
@@ -164,9 +165,10 @@ export function getToUpdateIpAllowListEntries({
 }
 
 export async function createIpAllowListEntries({ enterprise, cidrEntries, octokit }) {
+  const taskScheduler = new Bottleneck({ maxConcurrent: env.api.concurrency });
   const ownerId = enterprise.id;
   const promises = cidrEntries.map((cidrEntry) => {
-    return TaskScheduler.schedule(() =>
+    return taskScheduler.schedule(() =>
       CreateIpAllowListEntryCommand({ octokit, ownerId, cidrEntry }),
     );
   });
@@ -175,8 +177,9 @@ export async function createIpAllowListEntries({ enterprise, cidrEntries, octoki
 }
 
 export async function updateIpAllowListEntries({ ipAllowListEntries, octokit }) {
+  const taskScheduler = new Bottleneck({ maxConcurrent: env.api.concurrency });
   const promises = ipAllowListEntries.map((ipAllowListEntry) => {
-    return TaskScheduler.schedule(() =>
+    return taskScheduler.schedule(() =>
       UpdateIpAllowListEntryCommand({ octokit, ipAllowListEntry }),
     );
   });
@@ -185,10 +188,9 @@ export async function updateIpAllowListEntries({ ipAllowListEntries, octokit }) 
 }
 
 export async function deleteIpAllowListEntries({ ipAllowListEntries, octokit }) {
-  core.info(`TaskScheduler ${TaskScheduler}`);
-  core.info(`TaskScheduler ${TaskScheduler.schedule}`);
+  const taskScheduler = new Bottleneck({ maxConcurrent: env.api.concurrency });
   const promises = ipAllowListEntries.map((ipAllowListEntry) => {
-    return TaskScheduler.schedule(() =>
+    return taskScheduler.schedule(() =>
       DeleteIpAllowListEntryCommand({ octokit, ownerId, ipAllowListEntry }),
     );
   });

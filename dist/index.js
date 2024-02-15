@@ -33877,34 +33877,19 @@ function CreateGithubClient(token, maxRetries) {
 
 /***/ }),
 
-/***/ 3315:
+/***/ 4521:
 /***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
 
 "use strict";
 __nccwpck_require__.r(__webpack_exports__);
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "env": () => (/* binding */ env)
 /* harmony export */ });
-const Bottleneck = __nccwpck_require__(7356);
-
-class TaskScheduler {
-  constructor() {
-    this._limiter = new Bottleneck({
-      minTime: 150,
-      maxConcurrent: 10,
-    });
-  }
-
-  get limiter() {
-    return this._limiter;
-  }
-
-  schedule(task) {
-    return this._limiter.schedule(task);
-  }
-}
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (new TaskScheduler());
+const env = {
+  api: {
+    concurrency: process.env.API_CONCURRENCY || 16,
+  },
+};
 
 
 /***/ }),
@@ -34057,9 +34042,10 @@ __nccwpck_require__.r(__webpack_exports__);
 const core = __nccwpck_require__(2186);
 const YAML = __nccwpck_require__(4083);
 const { CidrEntry } = __nccwpck_require__(1843);
-const TaskScheduler = __nccwpck_require__(3315);
+const Bottleneck = __nccwpck_require__(7356);
 const { Octokit } = __nccwpck_require__(5375);
 const _ = __nccwpck_require__(5067);
+const { env } = __nccwpck_require__(4521);
 
 const {
   CreateIpAllowListEntryCommand,
@@ -34220,9 +34206,10 @@ function getToUpdateIpAllowListEntries({
 }
 
 async function createIpAllowListEntries({ enterprise, cidrEntries, octokit }) {
+  const taskScheduler = new Bottleneck({ maxConcurrent: env.api.concurrency });
   const ownerId = enterprise.id;
   const promises = cidrEntries.map((cidrEntry) => {
-    return TaskScheduler.schedule(() =>
+    return taskScheduler.schedule(() =>
       CreateIpAllowListEntryCommand({ octokit, ownerId, cidrEntry }),
     );
   });
@@ -34231,8 +34218,9 @@ async function createIpAllowListEntries({ enterprise, cidrEntries, octokit }) {
 }
 
 async function updateIpAllowListEntries({ ipAllowListEntries, octokit }) {
+  const taskScheduler = new Bottleneck({ maxConcurrent: env.api.concurrency });
   const promises = ipAllowListEntries.map((ipAllowListEntry) => {
-    return TaskScheduler.schedule(() =>
+    return taskScheduler.schedule(() =>
       UpdateIpAllowListEntryCommand({ octokit, ipAllowListEntry }),
     );
   });
@@ -34241,10 +34229,9 @@ async function updateIpAllowListEntries({ ipAllowListEntries, octokit }) {
 }
 
 async function deleteIpAllowListEntries({ ipAllowListEntries, octokit }) {
-  core.info(`TaskScheduler ${TaskScheduler}`);
-  core.info(`TaskScheduler ${TaskScheduler.schedule}`);
+  const taskScheduler = new Bottleneck({ maxConcurrent: env.api.concurrency });
   const promises = ipAllowListEntries.map((ipAllowListEntry) => {
-    return TaskScheduler.schedule(() =>
+    return taskScheduler.schedule(() =>
       DeleteIpAllowListEntryCommand({ octokit, ownerId, ipAllowListEntry }),
     );
   });
