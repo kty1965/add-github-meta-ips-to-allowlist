@@ -36,7 +36,7 @@ export async function GetEnterpriseScopedIpAllowListEntriesCommand({
 export async function GetEnterpriseCommand({ enterpriseSlug, octokit }) {
   const queryResult = await octokit.graphql({
     query: `
-    query getEnterprise($enterpriseSlug: String!, $cursor: String) {
+    query getEnterprise($enterpriseSlug: String!) {
       enterprise(slug: $enterpriseSlug) {
         databaseId
         name
