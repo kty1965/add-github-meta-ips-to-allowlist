@@ -21,11 +21,14 @@ A GitHub Action that will load Enterprise IP Allow List Entries from the [GitHub
 
 ## Examples
 
+> if you change input `scope` already created allowlist does not changed.
+> The scope groups only the allowList that we want to manage.
+
 - only metadata actions
 
   ```yaml
   - name: Add Actions to IP Allow List
-    uses: kty1965/add-github-meta-ips-to-allowlist@main
+    uses: kty1965/add-github-meta-ips-to-allowlist@v0.1.0
     with:
       github_token: ${{ secrets.ENTERPRISE_ACCESS_PAT }}
       enterprise_slug: ENTERPRISE_NAME
@@ -36,7 +39,7 @@ A GitHub Action that will load Enterprise IP Allow List Entries from the [GitHub
 
   ```yaml
   - name: Add additional cidr entries to IP Allow List
-    uses: kty1965/add-github-meta-ips-to-allowlist@main
+    uses: kty1965/add-github-meta-ips-to-allowlist@v0.1.0
     with:
       github_token: ${{ secrets.ENTERPRISE_ACCESS_PAT }}
       enterprise_slug: ENTERPRISE_NAME
@@ -73,7 +76,7 @@ A GitHub Action that will load Enterprise IP Allow List Entries from the [GitHub
         - name: Add Custom CIDRs to IP Allow List
           env:
             UV_THREADPOOL_SIZE: 32
-          uses: kty1965/add-github-meta-ips-to-allowlist@main
+          uses: kty1965/add-github-meta-ips-to-allowlist@v0.1.0
           with:
             github_token: ${{ secrets.ENTERPRISE_ACCESS_PAT }}
             enterprise_slug: modusign
