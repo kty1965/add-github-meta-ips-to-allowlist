@@ -33581,6 +33581,7 @@ __nccwpck_require__.r(__webpack_exports__);
 /* harmony export */   "UpdateIpAllowListEntryCommand": () => (/* binding */ UpdateIpAllowListEntryCommand)
 /* harmony export */ });
 const { IpAllowListEntry } = __nccwpck_require__(6018);
+const { Enterprise } = __nccwpck_require__(1857);
 
 const core = __nccwpck_require__(2186);
 
@@ -33933,6 +33934,43 @@ class CidrEntry {
 
   get isActive() {
     return this._isActive;
+  }
+}
+
+
+/***/ }),
+
+/***/ 1857:
+/***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
+
+"use strict";
+__nccwpck_require__.r(__webpack_exports__);
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   "Enterprise": () => (/* binding */ Enterprise)
+/* harmony export */ });
+class Enterprise {
+  constructor({ name, databaseId, slug, url, id }) {
+    this._databaseId = databaseId;
+    this._name = name;
+    this._slug = slug;
+    this._url = url;
+    this._id = id;
+  }
+
+  get databaseId() {
+    return this._databaseId;
+  }
+  get name() {
+    return this._name;
+  }
+  get slug() {
+    return this._slug;
+  }
+  get url() {
+    return this._url;
+  }
+  get id() {
+    return this._id;
   }
 }
 
