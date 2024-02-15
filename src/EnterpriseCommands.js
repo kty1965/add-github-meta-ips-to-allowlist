@@ -1,4 +1,5 @@
 const { IpAllowListEntry } = require('./models/IpAllowListEntry');
+const { Enterprise } = require('./models/Enterprise');
 
 const core = require('@actions/core');
 
