@@ -46850,22 +46850,24 @@ async function run() {
       existScopedIpAllowListEntries,
       expectCidrEntries,
     });
-    // const toDeleteResult = await deleteIpAllowListEntries({
-    //   ipAllowListEntries: toDelete,
-    //   octokit,
-    // });
+    const toDeleteResult = await deleteIpAllowListEntries({
+      ipAllowListEntries: toDelete,
+      octokit,
+    });
     core.info(`toDelete: ${JSON.stringify(toDelete)}`);
+    core.info(`toDeleteResult: ${JSON.stringify(toDeleteResult)}`);
 
     const toCreate = getToCreateIpAllowListEntries({
       existScopedIpAllowListEntries,
       expectCidrEntries,
     });
-    // const toCreateResult = await createIpAllowListEntries({
-    //   enterprise,
-    //   cidrEntries: toCreate,
-    //   octokit,
-    // });
+    const toCreateResult = await createIpAllowListEntries({
+      enterprise,
+      cidrEntries: toCreate,
+      octokit,
+    });
     core.info(`toCreate: ${JSON.stringify(toCreate)}`);
+    core.info(`toCreateResult: ${JSON.stringify(toCreateResult)}`);
 
     const toUpdateMergedIpAllowListEntries = getToUpdateIpAllowListEntries({
       existScopedIpAllowListEntries,
@@ -46877,11 +46879,12 @@ async function run() {
         isActive: cidrEntry.isActive,
       });
     });
-    // const toUpdateResult = await updateIpAllowListEntries({
-    //   ipAllowListEntries: toUpdateMergedIpAllowListEntries,
-    //   octokit,
-    // });
+    const toUpdateResult = await updateIpAllowListEntries({
+      ipAllowListEntries: toUpdateMergedIpAllowListEntries,
+      octokit,
+    });
     core.info(`toUpdate: ${JSON.stringify(toUpdateMergedIpAllowListEntries)}`);
+    core.info(`toUpdateResult: ${JSON.stringify(toUpdateResult)}`);
   } catch (err) {
     core.setFailed(err);
   }
