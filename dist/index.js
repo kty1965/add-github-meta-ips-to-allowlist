@@ -34103,11 +34103,22 @@ function getToDeleteIpAllowListEntries({
     existScopedIpAllowListEntries,
     'cidr',
   );
+  core.info(
+    `getToDeleteIpAllowListEntries.groupByCidrOnExpectCidrEntries: ${JSON.stringify(
+      toDeleteCidrs,
+    )}`,
+  );
+  core.info(
+    `getToDeleteIpAllowListEntries.groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
+      toDeleteCidrs,
+    )}`,
+  );
 
   const toDeleteCidrs = _.difference(
     _.values(groupByCidrOnExistScopedIpAllowListEntries),
     _.values(groupByCidrOnExpectCidrEntries),
   );
+  core.info(`getToDeleteIpAllowListEntries.toDeleteCidrs: ${JSON.stringify(toDeleteCidrs)}`);
 
   const toDeleteIpAllowListEntries = toDeleteCidrs.map((cidr) => {
     return groupByCidrOnExistScopedIpAllowListEntries[cidr];
@@ -34127,10 +34138,22 @@ function getToCreateIpAllowListEntries({
     'cidr',
   );
 
+  core.info(
+    `getToCreateIpAllowListEntries.groupByCidrOnExpectCidrEntries: ${JSON.stringify(
+      toDeleteCidrs,
+    )}`,
+  );
+  core.info(
+    `getToCreateIpAllowListEntries.groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
+      toDeleteCidrs,
+    )}`,
+  );
+
   const toCreateCidrs = _.difference(
     _.values(groupByCidrOnExpectCidrEntries),
     _.values(groupByCidrOnExistScopedIpAllowListEntries),
   );
+  core.info(`getToCreateIpAllowListEntries.toCreateCidrs: ${JSON.stringify(toCreateCidrs)}`);
 
   const toCreateIpAllowListEntries = toCreateCidrs.map((cidr) => {
     return groupByCidrOnExpectCidrEntries[cidr];
@@ -34148,6 +34171,17 @@ function getToUpdateIpAllowListEntries({
     'cidr',
   );
 
+  core.info(
+    `getToUpdateIpAllowListEntries.groupByCidrOnExpectCidrEntries: ${JSON.stringify(
+      toDeleteCidrs,
+    )}`,
+  );
+  core.info(
+    `getToUpdateIpAllowListEntries.groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
+      toDeleteCidrs,
+    )}`,
+  );
+
   const toUpdateTupleCidrEntryWithIpAllowListEntry = _.intersection(
     _.values(groupByCidrOnExpectCidrEntries),
     _.values(groupByCidrOnExistScopedIpAllowListEntries),
@@ -34163,6 +34197,12 @@ function getToUpdateIpAllowListEntries({
         cidrEntry.name != ipAllowListEntry.name || cidrEntry.isActive != ipAllowListEntry.isActive
       );
     });
+
+  core.info(
+    `getToUpdateIpAllowListEntries.toUpdateTupleCidrEntryWithIpAllowListEntry: ${JSON.stringify(
+      toUpdateTupleCidrEntryWithIpAllowListEntry,
+    )}`,
+  );
 
   return toUpdateTupleCidrEntryWithIpAllowListEntry;
 }
