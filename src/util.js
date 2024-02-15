@@ -23,12 +23,12 @@ async function getMetaCIDRs({ metadataKey }) {
   return metadata[metadataKey];
 }
 
-export async function getMetaCidrEntries({ metadataKey }) {
+export async function getMetaCidrEntries({ metadataKey, scope }) {
   const cidrs = await getMetaCIDRs({ metadataKey });
   const cidrEntries = cidrs.map(
     (cidr) =>
       new CidrEntry({
-        name: '@scope made by github action',
+        name: `${scope} made by github action`,
         cidr,
         isActive: true,
       }),

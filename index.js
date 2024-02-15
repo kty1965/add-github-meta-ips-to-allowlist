@@ -25,6 +25,7 @@ async function run() {
     const metadataKey = core.getInput('metadata_key');
     const additionalCidrEntries = core.getInput('additional_cidr_entries');
     const scope = core.getInput('scope');
+    const mode = core.getInput('mode');
 
     const octokit = CreateGithubClient(githubToken);
 
@@ -40,7 +41,7 @@ async function run() {
       });
 
     if (metadataKey) {
-      const cidrEntries = await getMetaCidrEntries({ metadataKey });
+      const cidrEntries = await getMetaCidrEntries({ metadataKey, scope });
       if (cidrEntries) {
         expectCidrEntries.push(...cidrEntries);
       } else {

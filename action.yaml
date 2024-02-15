@@ -1,4 +1,4 @@
-name: "add-github-meta-ips-to-allowlist"
+name: 'add-github-meta-ips-to-allowlist'
 description: GitHub meta ips store to enterprise ip allowlists
 author: Huy, Tae Young
 branding:
@@ -24,8 +24,13 @@ inputs:
   scope:
     description: scope prefix name
     required: false
-    default: "@scope"
+    default: '@scope'
+
+  mode:
+    description: sync or delete modes
+    required: false
+    default: 'sync'
 
 runs:
-  using: "node20"
-  main: "dist/index.js"
+  using: 'node20'
+  main: 'dist/index.js'
