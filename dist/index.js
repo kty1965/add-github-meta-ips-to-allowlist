@@ -33754,12 +33754,12 @@ async function CreateIpAllowListEntryCommand({ octokit, ownerId, cidrEntry }) {
 
 async function UpdateIpAllowListEntryCommand({ octokit, ipAllowListEntry }) {
   const { id, name, cidr, allowListValue, isActive } = ipAllowListEntry;
-  core.startGroup(`create cidr: ${cidr}`);
+  core.startGroup(`update cidr: ${cidr}`);
   core.info(`parameters`);
   core.info(`     id:  ${id}`);
   core.info(`   name:  ${name}`);
   core.info(`   cidr:  ${cidr}`);
-  core.info(` active:  ${!!isActive}`);
+  core.info(` isActive:  ${isActive}`);
   core.endGroup();
 
   const updatedIpAllowList = await octokit.graphql({
@@ -33786,7 +33786,7 @@ async function UpdateIpAllowListEntryCommand({ octokit, ipAllowListEntry }) {
     ipAllowListEntryId: id,
     name: name,
     cidr: cidr,
-    isActive: !!isActive,
+    isActive: isActive,
   });
   return new IpAllowListEntry(updatedIpAllowList);
 }
