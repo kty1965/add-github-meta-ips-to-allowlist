@@ -34121,7 +34121,7 @@ function getToDeleteIpAllowListEntries({
   core.info(`getToDeleteIpAllowListEntries.toDeleteCidrs: ${JSON.stringify(toDeleteCidrs)}`);
 
   const toDeleteIpAllowListEntries = toDeleteCidrs.map((cidr) => {
-    return groupByCidrOnExistScopedIpAllowListEntries[cidr];
+    return groupByCidrOnExistScopedIpAllowListEntries[cidr][0];
   });
 
   return toDeleteIpAllowListEntries;
@@ -34156,7 +34156,7 @@ function getToCreateIpAllowListEntries({
   core.info(`getToCreateIpAllowListEntries.toCreateCidrs: ${JSON.stringify(toCreateCidrs)}`);
 
   const toCreateIpAllowListEntries = toCreateCidrs.map((cidr) => {
-    return groupByCidrOnExpectCidrEntries[cidr];
+    return groupByCidrOnExpectCidrEntries[cidr][0];
   });
   return toCreateIpAllowListEntries;
 }
@@ -34188,8 +34188,8 @@ function getToUpdateIpAllowListEntries({
   )
     .map((cidr) => {
       return [
-        groupByCidrOnExpectCidrEntries[cidr],
-        groupByCidrOnExistScopedIpAllowListEntries[cidr],
+        groupByCidrOnExpectCidrEntries[cidr][0],
+        groupByCidrOnExistScopedIpAllowListEntries[cidr][0],
       ];
     })
     .filter(([cidrEntry, ipAllowListEntry]) => {
