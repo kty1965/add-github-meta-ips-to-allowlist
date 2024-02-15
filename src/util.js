@@ -71,8 +71,8 @@ export function getToDeleteIpAllowListEntries({
   );
 
   const toDeleteCidrs = _.difference(
-    _.values(groupByCidrOnExistScopedIpAllowListEntries),
-    _.values(groupByCidrOnExpectCidrEntries),
+    _.keys(groupByCidrOnExistScopedIpAllowListEntries),
+    _.keys(groupByCidrOnExpectCidrEntries),
   );
   core.info(`getToDeleteIpAllowListEntries.toDeleteCidrs: ${JSON.stringify(toDeleteCidrs)}`);
 
@@ -106,8 +106,8 @@ export function getToCreateIpAllowListEntries({
   );
 
   const toCreateCidrs = _.difference(
-    _.values(groupByCidrOnExpectCidrEntries),
-    _.values(groupByCidrOnExistScopedIpAllowListEntries),
+    _.keys(groupByCidrOnExpectCidrEntries),
+    _.keys(groupByCidrOnExistScopedIpAllowListEntries),
   );
   core.info(`getToCreateIpAllowListEntries.toCreateCidrs: ${JSON.stringify(toCreateCidrs)}`);
 
@@ -139,8 +139,8 @@ export function getToUpdateIpAllowListEntries({
   );
 
   const toUpdateTupleCidrEntryWithIpAllowListEntry = _.intersection(
-    _.values(groupByCidrOnExpectCidrEntries),
-    _.values(groupByCidrOnExistScopedIpAllowListEntries),
+    _.keys(groupByCidrOnExpectCidrEntries),
+    _.keys(groupByCidrOnExistScopedIpAllowListEntries),
   )
     .map((cidr) => {
       return [
