@@ -61,12 +61,12 @@ export function getToDeleteIpAllowListEntries({
   );
   core.info(
     `getToDeleteIpAllowListEntries.groupByCidrOnExpectCidrEntries: ${JSON.stringify(
-      toDeleteCidrs,
+      groupByCidrOnExpectCidrEntries,
     )}`,
   );
   core.info(
     `getToDeleteIpAllowListEntries.groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
-      toDeleteCidrs,
+      groupByCidrOnExistScopedIpAllowListEntries,
     )}`,
   );
 
@@ -96,12 +96,12 @@ export function getToCreateIpAllowListEntries({
 
   core.info(
     `getToCreateIpAllowListEntries.groupByCidrOnExpectCidrEntries: ${JSON.stringify(
-      toDeleteCidrs,
+      groupByCidrOnExpectCidrEntries,
     )}`,
   );
   core.info(
     `getToCreateIpAllowListEntries.groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
-      toDeleteCidrs,
+      groupByCidrOnExistScopedIpAllowListEntries,
     )}`,
   );
 
@@ -129,12 +129,12 @@ export function getToUpdateIpAllowListEntries({
 
   core.info(
     `getToUpdateIpAllowListEntries.groupByCidrOnExpectCidrEntries: ${JSON.stringify(
-      toDeleteCidrs,
+      groupByCidrOnExpectCidrEntries,
     )}`,
   );
   core.info(
     `getToUpdateIpAllowListEntries.groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
-      toDeleteCidrs,
+      groupByCidrOnExistScopedIpAllowListEntries,
     )}`,
   );
 
