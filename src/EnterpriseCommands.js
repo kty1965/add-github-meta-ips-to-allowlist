@@ -164,9 +164,9 @@ export async function CreateIpAllowListEntryCommand({ octokit, ownerId, cidrEntr
       }
     `,
     owner: ownerId,
-    name: name,
-    cidr: cidr,
-    isActive: !!isActive,
+    name,
+    cidr,
+    isActive,
   });
   core.info(`result ${JSON.stringify(createdIpAllowList)}`);
   core.endGroup();
@@ -203,10 +203,10 @@ export async function UpdateIpAllowListEntryCommand({ octokit, ipAllowListEntry 
         }
       }
     `,
-    ipAllowListEntryId: id,
-    name: name,
-    cidr: cidr,
-    isActive: isActive,
+    id,
+    name,
+    cidr,
+    isActive,
   });
   core.info(`result ${JSON.stringify(updatedIpAllowList)}`);
   core.endGroup();
