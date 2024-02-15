@@ -1,4 +1,4 @@
-const { IpAllowListEntry } = require('./ipAllowListEntry');
+const { IpAllowListEntry } = require('./models/IpAllowListEntry');
 
 const core = require('@actions/core');
 
@@ -7,7 +7,11 @@ export async function GetEnterpriseScopedIpAllowListEntriesCommand({
   octokit,
   scope,
 }) {
-  const { enterprise, ipAllowListEntries } = await GetEnterpriseIpAllowListEntriesCommand({
+  const enterprise = await GetEnterpriseCommand({
+    enterpriseSlug,
+    octokit,
+  });
+  const ipAllowListEntries = await GetIpAllowListEntriesCommand({
     enterpriseSlug,
     octokit,
   });
@@ -28,7 +32,27 @@ export async function GetEnterpriseScopedIpAllowListEntriesCommand({
     ipAllowListEntries: scopedIpAllowListEntries,
   };
 }
-export async function GetEnterpriseIpAllowListEntriesCommand({ enterpriseSlug, octokit }) {
+
+export async function GetEnterpriseCommand({ enterpriseSlug, octokit }) {
+  const queryResult = await octokit.graphql({
+    query: `
+    query getEnterprise($enterpriseSlug: String!, $cursor: String) {
+      enterprise(slug: $enterpriseSlug) {
+        databaseId
+        name
+        slug
+        url,
+        id,
+      }
+    }
+    `,
+    enterpriseSlug,
+  });
+
+  return new Enterprise(queryResult.enterprise);
+}
+
+export async function GetIpAllowListEntriesCommand({ enterpriseSlug, octokit }) {
   const ipAllowListEntries = [];
   const queryParameters = {
     query: `
@@ -47,6 +71,7 @@ export async function GetEnterpriseIpAllowListEntriesCommand({ enterpriseSlug, o
             }
             totalCount
             nodes {
+              id
               name
               createdAt
               updatedAt
@@ -61,20 +86,9 @@ export async function GetEnterpriseIpAllowListEntriesCommand({ enterpriseSlug, o
     enterpriseSlug,
   };
 
-  let enterprise = undefined;
-
   let hasNextPage = false;
   do {
     const queryResult = await octokit.graphql(queryParameters);
-
-    if (!enterprise) {
-      enterprise = {
-        databaseId: queryResult.enterprise.databaseId,
-        name: queryResult.enterprise.name,
-        url: queryResult.enterprise.url,
-        id: queryResult.enterprise.id,
-      };
-    }
 
     const ipEntries = getObject(
       queryResult,
@@ -100,10 +114,7 @@ export async function GetEnterpriseIpAllowListEntriesCommand({ enterpriseSlug, o
     }
   } while (hasNextPage);
 
-  return {
-    enterprise,
-    ipAllowListEntries,
-  };
+  return ipAllowListEntries;
 }
 
 function getObject(target, ...path) {
@@ -119,61 +130,112 @@ function getObject(target, ...path) {
   return null;
 }
 
-// export async function addAllowListCIDRs(name, cidrs, isActive) {
-//   const promises = [];
+export async function CreateIpAllowListEntryCommand({ octokit, ownerId, cidrEntry }) {
+  const { name, cidr, isActive } = cidrEntry;
+  core.startGroup(`create cidr: ${cidr}`);
+  core.info(`parameters`);
+  core.info(`  owner:  ${ownerId}`);
+  core.info(`   name:  ${name}`);
+  core.info(`   cidr:  ${cidr}`);
+  core.info(` active:  ${!!isActive}`);
+  core.endGroup();
 
-//   cidrs.forEach(cidr => {
-//       promises.push(this.addIpAllowList(name, cidr, isActive));
-//   });
+  const createdIpAllowList = await octokit.graphql({
+    query: `
+      mutation createIpAllowListEntry($owner: ID!, $cidr: String!, $name: String!, $isActive: Boolean!) {
+        createIpAllowListEntry(input: {
+          allowListValue: $cidr,
+          isActive: $isActive,
+          name: $name,
+          ownerId: $owner
+        }) {
+          clientMutationId
+          ipAllowListEntry {
+            id
+            allowListValue
+            createdAt
+            updatedAt
+            isActive
+            name
+          }
+        }
+      }
+    `,
+    owner: ownerId,
+    name: name,
+    cidr: cidr,
+    isActive: !!isActive,
+  });
+  return new IpAllowListEntry(createdIpAllowList);
+}
 
-//   return await Promise.all(promises);
-// }
+export async function UpdateIpAllowListEntryCommand({ octokit, cidrEntry, ipAllowListEntry }) {
+  const { name, cidr, isActive } = cidrEntry;
+  const { id } = ipAllowListEntry;
+  core.startGroup(`create cidr: ${cidr}`);
+  core.info(`parameters`);
+  core.info(`     id:  ${id}`);
+  core.info(`   name:  ${name}`);
+  core.info(`   cidr:  ${cidr}`);
+  core.info(` active:  ${!!isActive}`);
+  core.endGroup();
 
-// export async function addIpAllowList(name, cidr, isActive) {
-//   const existing = await this.getEnterpriseIpAllowListEntries();
-//   const existingCIDRs = existing.map(value => value.cidr);
-//   const matchedIndex = existingCIDRs.indexOf(cidr);
+  const updatedIpAllowList = await octokit.graphql({
+    query: `
+      mutation updateIpAllowListEntry($id: ID!, $cidr: String!, $name: String!, $isActive: Boolean!) {
+        updateIpAllowListEntry(input: {
+          allowListValue: $cidr,
+          isActive: $isActive,
+          name: $name,
+          ipAllowListEntryId: $id
+        }) {
+          clientMutationId
+          ipAllowListEntry {
+            id
+            allowListValue
+            createdAt
+            updatedAt
+            isActive
+            name
+          }
+        }
+      }
+    `,
+    ipAllowListEntryId: id,
+    name: name,
+    cidr: cidr,
+    isActive: !!isActive,
+  });
+  return new IpAllowListEntry(updatedIpAllowList);
+}
 
-//   if (matchedIndex > -1) {
-//       return existing[matchedIndex];
-//   } else  {
-//       return await this._limiter.schedule(() => addIpAllowList(this.octokit, this.id, name, cidr, isActive));
-//   }
-// }}
+export async function DeleteIpAllowListEntryCommand({ octokit, ipAllowListEntry }) {
+  const { id, cidr, name } = ipAllowListEntry;
+  core.startGroup(`delete cidr: ${cidr}`);
+  core.info(`parameters`);
+  core.info(`  id:   ${id}`);
+  core.info(`  name: ${name}`);
+  core.endGroup();
 
-// export async function addIpAllowList(octokit, id, name, cidr, isActive) {
-//   core.startGroup(`Adding cidr: ${cidr}`);
-//   core.info(`  parameters`);
-//   core.info(`     owner:  ${id}`);
-//   core.info(`     name:   ${name}`);
-//   core.info(`     cidr:   ${cidr}`);
-//   core.info(`     active: ${!!isActive}`);
-//   core.endGroup();
-
-//   const ipAllowList = await octokit.graphql({
-//     query: `
-//           mutation addAllowList($owner: ID!, $cidr: String!, $name: String!, $isActive: Boolean!) {
-//               createIpAllowListEntry(input: {
-//                   allowListValue: $cidr,
-//                   isActive: $isActive,
-//                   name: $name,
-//                   ownerId: $owner
-//               }) {
-//                   clientMutationId
-//                   ipAllowListEntry {
-//                       allowListValue
-//                       createdAt
-//                       updatedAt
-//                       isActive
-//                       name
-//                   }
-//               }
-//           }
-//           `,
-//     owner: id,
-//     name: name,
-//     cidr: cidr,
-//     isActive: !!isActive,
-//   });
-//   return new IpAllowListEntry(ipAllowList);
-// }
+  const deletedIpAllowList = await octokit.graphql({
+    query: `
+      mutation deleteIpAllowListEntry($id: ID!) {
+        deleteIpAllowListEntry(input: {
+          ipAllowListEntryId: $id
+        }) {
+          clientMutationId
+          ipAllowListEntry {
+            id
+            allowListValue
+            createdAt
+            updatedAt
+            isActive
+            name
+          }
+        }
+      }
+    `,
+    id,
+  });
+  return new IpAllowListEntry(deletedIpAllowList);
+}

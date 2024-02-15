@@ -1,7 +1,15 @@
 const core = require('@actions/core');
 const YAML = require('yaml');
-const { CidrEntry } = require('./CidrEntry');
+const { CidrEntry } = require('./models/CidrEntry');
+const TaskScheduler = require('./TaskScheduler');
 const { Octokit } = require('@octokit/rest');
+const _ = require('underscore');
+
+const {
+  CreateIpAllowListEntryCommand,
+  DeleteIpAllowListEntryCommand,
+  UpdateIpAllowListEntryCommand,
+} = require('./EnterpriseCommands');
 
 async function getMetaCIDRs({ metadataKey }) {
   const octokitRest = new Octokit();
@@ -46,10 +54,21 @@ export function getToDeleteIpAllowListEntries({
   expectCidrEntries,
 }) {
   // find set existScopedIpAllowListEntries - expectCidrEntries
-  const expectCidrs = expectCidrEntries.map((cidrEntry) => cidrEntry.cidr);
-  const toDeleteIpAllowListEntries = existScopedIpAllowListEntries.filter((scoped) => {
-    return expectCidrs.indexOf(scoped.cidr) === -1; // find only exist in existScopedIpAllowListEntries
+  const groupByCidrOnExpectCidrEntries = _.groupBy(expectCidrEntries, 'cidr');
+  const groupByCidrOnExistScopedIpAllowListEntries = _.groupBy(
+    existScopedIpAllowListEntries,
+    'cidr',
+  );
+
+  const toDeleteCidrs = _.difference(
+    _.values(groupByCidrOnExistScopedIpAllowListEntries),
+    _.values(groupByCidrOnExpectCidrEntries),
+  );
+
+  const toDeleteIpAllowListEntries = toDeleteCidrs.map((cidr) => {
+    return groupByCidrOnExistScopedIpAllowListEntries[cidr];
   });
+
   return toDeleteIpAllowListEntries;
 }
 
@@ -58,9 +77,19 @@ export function getToCreateIpAllowListEntries({
   expectCidrEntries,
 }) {
   // find set expectCidrEntries -   existScopedIpAllowListEntries
-  const existCidrs = existScopedIpAllowListEntries.map((ipAllowListEntry) => ipAllowListEntry.cidr);
-  const toCreateIpAllowListEntries = expectCidrEntries.filter((expect) => {
-    return existCidrs.indexOf(expect.cidr) === -1; // find only exist in   expectCidrEntries
+  const groupByCidrOnExpectCidrEntries = _.groupBy(expectCidrEntries, 'cidr');
+  const groupByCidrOnExistScopedIpAllowListEntries = _.groupBy(
+    existScopedIpAllowListEntries,
+    'cidr',
+  );
+
+  const toCreateCidrs = _.difference(
+    _.values(groupByCidrOnExpectCidrEntries),
+    _.values(groupByCidrOnExistScopedIpAllowListEntries),
+  );
+
+  const toCreateIpAllowListEntries = toCreateCidrs.map((cidr) => {
+    return groupByCidrOnExpectCidrEntries[cidr];
   });
   return toCreateIpAllowListEntries;
 }
@@ -69,16 +98,58 @@ export function getToUpdateIpAllowListEntries({
   existScopedIpAllowListEntries,
   expectCidrEntries,
 }) {
-  const existCidrs = existScopedIpAllowListEntries.map((ipAllowListEntry) => ipAllowListEntry.cidr);
-  const candidateToUpdateIpAllowListEntries = expectCidrEntries.filter((scoped) => {
-    return existCidrs.indexOf(scoped.cidr) > -1; // find only two sections
+  const groupByCidrOnExpectCidrEntries = _.groupBy(expectCidrEntries, 'cidr');
+  const groupByCidrOnExistScopedIpAllowListEntries = _.groupBy(
+    existScopedIpAllowListEntries,
+    'cidr',
+  );
+
+  const toUpdateTupleCidrEntryWithIpAllowListEntry = _.intersection(
+    _.values(groupByCidrOnExpectCidrEntries),
+    _.values(groupByCidrOnExistScopedIpAllowListEntries),
+  )
+    .map((cidr) => {
+      return [
+        groupByCidrOnExpectCidrEntries[cidr],
+        groupByCidrOnExistScopedIpAllowListEntries[cidr],
+      ];
+    })
+    .filter(([cidrEntry, ipAllowListEntry]) => {
+      return (
+        cidrEntry.name != ipAllowListEntry.name || cidrEntry.isActive != ipAllowListEntry.isActive
+      );
+    });
+
+  return toUpdateTupleCidrEntryWithIpAllowListEntry;
+}
+
+export async function createIpAllowListEntries({ enterprise, cidrEntries, octokit }) {
+  const ownerId = enterprise.id;
+  const promises = cidrEntries.map((cidrEntry) => {
+    return TaskScheduler.schedule(() =>
+      CreateIpAllowListEntryCommand({ octokit, ownerId, cidrEntry }),
+    );
   });
 
-  const toUpdateIpAllowListEntries = candidateToUpdateIpAllowListEntries.filter(
-    (candidateToUpdateIpAllowListEntry) => {
-      // TODO extract need to update entries
-      return true;
-    },
-  );
-  return toUpdateIpAllowListEntries;
+  return await Promise.all(promises);
+}
+
+export async function updateIpAllowListEntries({ enterprise, cidrEntries, octokit }) {
+  const promises = cidrEntries.map((cidrEntry) => {
+    return TaskScheduler.schedule(() =>
+      UpdateIpAllowListEntryCommand({ octokit, ownerId, cidrEntry }),
+    );
+  });
+
+  return await Promise.all(promises);
+}
+
+export async function deleteIpAllowListEntries({ ipAllowListEntries, octokit }) {
+  const promises = ipAllowListEntries.map((ipAllowListEntry) => {
+    return TaskScheduler.schedule(() =>
+      DeleteIpAllowListEntryCommand({ octokit, ownerId, ipAllowListEntry }),
+    );
+  });
+
+  return await Promise.all(promises);
 }

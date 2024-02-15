@@ -10,6 +10,9 @@ const {
   getToDeleteIpAllowListEntries,
   getToCreateIpAllowListEntries,
   getToUpdateIpAllowListEntries,
+  createIpAllowListEntries,
+  deleteIpAllowListEntries,
+  updateIpAllowListEntries,
 } = require('./src/util');
 
 const expectCidrEntries = [];
@@ -57,19 +60,32 @@ async function run() {
       existScopedIpAllowListEntries,
       expectCidrEntries,
     });
+    // const toDeleteResult = await deleteIpAllowListEntries({
+    //   ipAllowListEntries: toDelete,
+    //   octokit,
+    // });
     core.info(`toDelete: ${JSON.stringify(toDelete)}`);
 
     const toCreate = getToCreateIpAllowListEntries({
       existScopedIpAllowListEntries,
       expectCidrEntries,
     });
+    // const toCreateResult = await createIpAllowListEntries({
+    //   enterprise,
+    //   cidrEntries: toCreate,
+    //   octokit,
+    // });
     core.info(`toCreate: ${JSON.stringify(toCreate)}`);
 
-    const toUpdate = getToUpdateIpAllowListEntries({
+    const toUpdateTupleCidrEntryWithIpAllowListEntry = getToUpdateIpAllowListEntries({
       existScopedIpAllowListEntries,
       expectCidrEntries,
     });
-    core.info(`toUpdate: ${JSON.stringify(toUpdate)}`);
+    // const toUpdateResult = await updateIpAllowListEntries({
+    //   cidrEntries,
+    //   octokit,
+    // });
+    core.info(`toUpdate: ${JSON.stringify(toUpdateTupleCidrEntryWithIpAllowListEntry)}`);
   } catch (err) {
     core.setFailed(err);
   }
