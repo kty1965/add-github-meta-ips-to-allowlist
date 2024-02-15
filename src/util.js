@@ -187,7 +187,6 @@ export async function updateIpAllowListEntries({ ipAllowListEntries, octokit }) 
 export async function deleteIpAllowListEntries({ ipAllowListEntries, octokit }) {
   core.info(`TaskScheduler ${TaskScheduler}`);
   core.info(`TaskScheduler ${TaskScheduler.schedule}`);
-  core.info(`TaskScheduler ${JSON.stringify(TaskScheduler)}`);
   const promises = ipAllowListEntries.map((ipAllowListEntry) => {
     return TaskScheduler.schedule(() =>
       DeleteIpAllowListEntryCommand({ octokit, ownerId, ipAllowListEntry }),
