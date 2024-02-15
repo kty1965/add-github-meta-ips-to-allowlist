@@ -33750,7 +33750,7 @@ async function CreateIpAllowListEntryCommand({ octokit, ownerId, cidrEntry }) {
     cidr: cidr,
     isActive: !!isActive,
   });
-  core.debug(`${JSON.stringify(createdIpAllowList)}`);
+  core.info(`result ${JSON.stringify(createdIpAllowList)}`);
   core.endGroup();
   return new IpAllowListEntry(createdIpAllowList);
 }
@@ -33790,7 +33790,7 @@ async function UpdateIpAllowListEntryCommand({ octokit, ipAllowListEntry }) {
     cidr: cidr,
     isActive: isActive,
   });
-  core.debug(`${JSON.stringify(updatedIpAllowList)}`);
+  core.info(`result ${JSON.stringify(updatedIpAllowList)}`);
   core.endGroup();
   return new IpAllowListEntry(updatedIpAllowList);
 }
@@ -33822,7 +33822,7 @@ async function DeleteIpAllowListEntryCommand({ octokit, ipAllowListEntry }) {
     `,
     id,
   });
-  core.debug(`${JSON.stringify(deletedIpAllowList)}`);
+  core.info(`result ${JSON.stringify(deletedIpAllowList)}`);
   core.endGroup();
   return new IpAllowListEntry(deletedIpAllowList);
 }
