@@ -134,10 +134,10 @@ export async function createIpAllowListEntries({ enterprise, cidrEntries, octoki
   return await Promise.all(promises);
 }
 
-export async function updateIpAllowListEntries({ enterprise, cidrEntries, octokit }) {
-  const promises = cidrEntries.map((cidrEntry) => {
+export async function updateIpAllowListEntries({ ipAllowListEntries, octokit }) {
+  const promises = ipAllowListEntries.map((ipAllowListEntry) => {
     return TaskScheduler.schedule(() =>
-      UpdateIpAllowListEntryCommand({ octokit, ownerId, cidrEntry }),
+      UpdateIpAllowListEntryCommand({ octokit, ipAllowListEntry }),
     );
   });
 

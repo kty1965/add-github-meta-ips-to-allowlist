@@ -14,6 +14,7 @@ const {
   deleteIpAllowListEntries,
   updateIpAllowListEntries,
 } = require('./src/util');
+const { IpAllowListEntry } = require('./src/models/IpAllowListEntry');
 
 const expectCidrEntries = [];
 
@@ -77,15 +78,21 @@ async function run() {
     // });
     core.info(`toCreate: ${JSON.stringify(toCreate)}`);
 
-    const toUpdateTupleCidrEntryWithIpAllowListEntry = getToUpdateIpAllowListEntries({
+    const toUpdateMergedIpAllowListEntries = getToUpdateIpAllowListEntries({
       existScopedIpAllowListEntries,
       expectCidrEntries,
+    }).map(([cidrEntry, ipAllowListEntry]) => {
+      return new IpAllowListEntry({
+        ...ipAllowListEntry,
+        name: cidrEntry.name,
+        isActive: cidrEntry.isActive,
+      });
     });
     // const toUpdateResult = await updateIpAllowListEntries({
-    //   cidrEntries,
+    //   ipAllowListEntries: toUpdateMergedIpAllowListEntries,
     //   octokit,
     // });
-    core.info(`toUpdate: ${JSON.stringify(toUpdateTupleCidrEntryWithIpAllowListEntry)}`);
+    core.info(`toUpdate: ${JSON.stringify(toUpdateMergedIpAllowListEntries)}`);
   } catch (err) {
     core.setFailed(err);
   }

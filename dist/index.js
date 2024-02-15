@@ -30865,43 +30865,43 @@ async function CreateIpAllowListEntryCommand({ octokit, ownerId, cidrEntry }) {
   return new IpAllowListEntry(createdIpAllowList);
 }
 
-async function UpdateIpAllowListEntryCommand({ octokit, cidrEntry, ipAllowListEntry }) {
-  const { name, cidr, isActive } = cidrEntry;
-  const { id } = ipAllowListEntry;
-  core.startGroup(`create cidr: ${cidr}`);
-  core.info(`parameters`);
-  core.info(`     id:  ${id}`);
-  core.info(`   name:  ${name}`);
-  core.info(`   cidr:  ${cidr}`);
-  core.info(` active:  ${!!isActive}`);
-  core.endGroup();
+async function UpdateIpAllowListEntryCommand({ octokit, ipAllowListEntry }) {
+  // const { name, cidr, isActive } = cidrEntry;
+  // const { id } = ipAllowListEntry;
+  // core.startGroup(`create cidr: ${cidr}`);
+  // core.info(`parameters`);
+  // core.info(`     id:  ${id}`);
+  // core.info(`   name:  ${name}`);
+  // core.info(`   cidr:  ${cidr}`);
+  // core.info(` active:  ${!!isActive}`);
+  // core.endGroup();
 
-  const updatedIpAllowList = await octokit.graphql({
-    query: `
-      mutation updateIpAllowListEntry($id: ID!, $cidr: String!, $name: String!, $isActive: Boolean!) {
-        updateIpAllowListEntry(input: {
-          allowListValue: $cidr,
-          isActive: $isActive,
-          name: $name,
-          ipAllowListEntryId: $id
-        }) {
-          clientMutationId
-          ipAllowListEntry {
-            id
-            allowListValue
-            createdAt
-            updatedAt
-            isActive
-            name
-          }
-        }
-      }
-    `,
-    ipAllowListEntryId: id,
-    name: name,
-    cidr: cidr,
-    isActive: !!isActive,
-  });
+  // const updatedIpAllowList = await octokit.graphql({
+  //   query: `
+  //     mutation updateIpAllowListEntry($id: ID!, $cidr: String!, $name: String!, $isActive: Boolean!) {
+  //       updateIpAllowListEntry(input: {
+  //         allowListValue: $cidr,
+  //         isActive: $isActive,
+  //         name: $name,
+  //         ipAllowListEntryId: $id
+  //       }) {
+  //         clientMutationId
+  //         ipAllowListEntry {
+  //           id
+  //           allowListValue
+  //           createdAt
+  //           updatedAt
+  //           isActive
+  //           name
+  //         }
+  //       }
+  //     }
+  //   `,
+  //   ipAllowListEntryId: id,
+  //   name: name,
+  //   cidr: cidr,
+  //   isActive: !!isActive,
+  // });
   return new IpAllowListEntry(updatedIpAllowList);
 }
 
@@ -31252,10 +31252,10 @@ async function createIpAllowListEntries({ enterprise, cidrEntries, octokit }) {
   return await Promise.all(promises);
 }
 
-async function updateIpAllowListEntries({ enterprise, cidrEntries, octokit }) {
-  const promises = cidrEntries.map((cidrEntry) => {
+async function updateIpAllowListEntries({ ipAllowListEntries, octokit }) {
+  const promises = ipAllowListEntries.map((ipAllowListEntry) => {
     return TaskScheduler.schedule(() =>
-      UpdateIpAllowListEntryCommand({ octokit, ownerId, cidrEntry }),
+      UpdateIpAllowListEntryCommand({ octokit, ipAllowListEntry }),
     );
   });
 
@@ -43809,6 +43809,7 @@ const {
   deleteIpAllowListEntries,
   updateIpAllowListEntries,
 } = __nccwpck_require__(6254);
+const { IpAllowListEntry } = __nccwpck_require__(6018);
 
 const expectCidrEntries = [];
 
@@ -43872,15 +43873,21 @@ async function run() {
     // });
     core.info(`toCreate: ${JSON.stringify(toCreate)}`);
 
-    const toUpdateTupleCidrEntryWithIpAllowListEntry = getToUpdateIpAllowListEntries({
+    const toUpdateMergedIpAllowListEntries = getToUpdateIpAllowListEntries({
       existScopedIpAllowListEntries,
       expectCidrEntries,
+    }).map(([cidrEntry, ipAllowListEntry]) => {
+      return new IpAllowListEntry({
+        ...ipAllowListEntry,
+        name: cidrEntry.name,
+        isActive: cidrEntry.isActive,
+      });
     });
     // const toUpdateResult = await updateIpAllowListEntries({
-    //   cidrEntries,
+    //   ipAllowListEntries: toUpdateMergedIpAllowListEntries,
     //   octokit,
     // });
-    core.info(`toUpdate: ${JSON.stringify(toUpdateTupleCidrEntryWithIpAllowListEntry)}`);
+    core.info(`toUpdate: ${JSON.stringify(toUpdateMergedIpAllowListEntries)}`);
   } catch (err) {
     core.setFailed(err);
   }

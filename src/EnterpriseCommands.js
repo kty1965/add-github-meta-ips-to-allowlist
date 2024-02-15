@@ -169,43 +169,43 @@ export async function CreateIpAllowListEntryCommand({ octokit, ownerId, cidrEntr
   return new IpAllowListEntry(createdIpAllowList);
 }
 
-export async function UpdateIpAllowListEntryCommand({ octokit, cidrEntry, ipAllowListEntry }) {
-  const { name, cidr, isActive } = cidrEntry;
-  const { id } = ipAllowListEntry;
-  core.startGroup(`create cidr: ${cidr}`);
-  core.info(`parameters`);
-  core.info(`     id:  ${id}`);
-  core.info(`   name:  ${name}`);
-  core.info(`   cidr:  ${cidr}`);
-  core.info(` active:  ${!!isActive}`);
-  core.endGroup();
+export async function UpdateIpAllowListEntryCommand({ octokit, ipAllowListEntry }) {
+  // const { name, cidr, isActive } = cidrEntry;
+  // const { id } = ipAllowListEntry;
+  // core.startGroup(`create cidr: ${cidr}`);
+  // core.info(`parameters`);
+  // core.info(`     id:  ${id}`);
+  // core.info(`   name:  ${name}`);
+  // core.info(`   cidr:  ${cidr}`);
+  // core.info(` active:  ${!!isActive}`);
+  // core.endGroup();
 
-  const updatedIpAllowList = await octokit.graphql({
-    query: `
-      mutation updateIpAllowListEntry($id: ID!, $cidr: String!, $name: String!, $isActive: Boolean!) {
-        updateIpAllowListEntry(input: {
-          allowListValue: $cidr,
-          isActive: $isActive,
-          name: $name,
-          ipAllowListEntryId: $id
-        }) {
-          clientMutationId
-          ipAllowListEntry {
-            id
-            allowListValue
-            createdAt
-            updatedAt
-            isActive
-            name
-          }
-        }
-      }
-    `,
-    ipAllowListEntryId: id,
-    name: name,
-    cidr: cidr,
-    isActive: !!isActive,
-  });
+  // const updatedIpAllowList = await octokit.graphql({
+  //   query: `
+  //     mutation updateIpAllowListEntry($id: ID!, $cidr: String!, $name: String!, $isActive: Boolean!) {
+  //       updateIpAllowListEntry(input: {
+  //         allowListValue: $cidr,
+  //         isActive: $isActive,
+  //         name: $name,
+  //         ipAllowListEntryId: $id
+  //       }) {
+  //         clientMutationId
+  //         ipAllowListEntry {
+  //           id
+  //           allowListValue
+  //           createdAt
+  //           updatedAt
+  //           isActive
+  //           name
+  //         }
+  //       }
+  //     }
+  //   `,
+  //   ipAllowListEntryId: id,
+  //   name: name,
+  //   cidr: cidr,
+  //   isActive: !!isActive,
+  // });
   return new IpAllowListEntry(updatedIpAllowList);
 }
 
