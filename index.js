@@ -83,7 +83,7 @@ async function run() {
       expectCidrEntries,
     }).map(([cidrEntry, ipAllowListEntry]) => {
       return new IpAllowListEntry({
-        ...ipAllowListEntry,
+        ...ipAllowListEntry.toDictionary(),
         name: cidrEntry.name,
         isActive: cidrEntry.isActive,
       });

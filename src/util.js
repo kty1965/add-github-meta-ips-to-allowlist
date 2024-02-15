@@ -59,12 +59,12 @@ export function getToDeleteIpAllowListEntries({
     existScopedIpAllowListEntries,
     'cidr',
   );
-  core.info(
+  core.debug(
     `getToDeleteIpAllowListEntries.groupByCidrOnExpectCidrEntries: ${JSON.stringify(
       groupByCidrOnExpectCidrEntries,
     )}`,
   );
-  core.info(
+  core.debug(
     `getToDeleteIpAllowListEntries.groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
       groupByCidrOnExistScopedIpAllowListEntries,
     )}`,
@@ -74,7 +74,7 @@ export function getToDeleteIpAllowListEntries({
     _.keys(groupByCidrOnExistScopedIpAllowListEntries),
     _.keys(groupByCidrOnExpectCidrEntries),
   );
-  core.info(`getToDeleteIpAllowListEntries.toDeleteCidrs: ${JSON.stringify(toDeleteCidrs)}`);
+  core.debug(`getToDeleteIpAllowListEntries.toDeleteCidrs: ${JSON.stringify(toDeleteCidrs)}`);
 
   const toDeleteIpAllowListEntries = toDeleteCidrs.map((cidr) => {
     return groupByCidrOnExistScopedIpAllowListEntries[cidr][0];
@@ -94,12 +94,12 @@ export function getToCreateIpAllowListEntries({
     'cidr',
   );
 
-  core.info(
+  core.debug(
     `getToCreateIpAllowListEntries.groupByCidrOnExpectCidrEntries: ${JSON.stringify(
       groupByCidrOnExpectCidrEntries,
     )}`,
   );
-  core.info(
+  core.debug(
     `getToCreateIpAllowListEntries.groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
       groupByCidrOnExistScopedIpAllowListEntries,
     )}`,
@@ -109,7 +109,7 @@ export function getToCreateIpAllowListEntries({
     _.keys(groupByCidrOnExpectCidrEntries),
     _.keys(groupByCidrOnExistScopedIpAllowListEntries),
   );
-  core.info(`getToCreateIpAllowListEntries.toCreateCidrs: ${JSON.stringify(toCreateCidrs)}`);
+  core.debug(`getToCreateIpAllowListEntries.toCreateCidrs: ${JSON.stringify(toCreateCidrs)}`);
 
   const toCreateIpAllowListEntries = toCreateCidrs.map((cidr) => {
     return groupByCidrOnExpectCidrEntries[cidr][0];
@@ -127,12 +127,12 @@ export function getToUpdateIpAllowListEntries({
     'cidr',
   );
 
-  core.info(
+  core.debug(
     `getToUpdateIpAllowListEntries.groupByCidrOnExpectCidrEntries: ${JSON.stringify(
       groupByCidrOnExpectCidrEntries,
     )}`,
   );
-  core.info(
+  core.debug(
     `getToUpdateIpAllowListEntries.groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
       groupByCidrOnExistScopedIpAllowListEntries,
     )}`,
@@ -154,7 +154,7 @@ export function getToUpdateIpAllowListEntries({
       );
     });
 
-  core.info(
+  core.debug(
     `getToUpdateIpAllowListEntries.toUpdateTupleCidrEntryWithIpAllowListEntry: ${JSON.stringify(
       toUpdateTupleCidrEntryWithIpAllowListEntry,
     )}`,

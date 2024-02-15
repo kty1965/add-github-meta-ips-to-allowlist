@@ -35,4 +35,16 @@ export class IpAllowListEntry {
   get id() {
     return this._id;
   }
+
+  toDictionary() {
+    return {
+      name: this._name,
+      cidr: this._allowListValue,
+      allowListValue: this._allowListValue,
+      isActive: this._isActive,
+      createdAt: this._createdAt,
+      updatedAt: this._updatedAt,
+      id: this._id,
+    };
+  }
 }

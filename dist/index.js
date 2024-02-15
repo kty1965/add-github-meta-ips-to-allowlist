@@ -34022,6 +34022,18 @@ class IpAllowListEntry {
   get id() {
     return this._id;
   }
+
+  toDictionary() {
+    return {
+      name: this._name,
+      cidr: this._allowListValue,
+      allowListValue: this._allowListValue,
+      isActive: this._isActive,
+      createdAt: this._createdAt,
+      updatedAt: this._updatedAt,
+      id: this._id,
+    };
+  }
 }
 
 
@@ -34103,12 +34115,12 @@ function getToDeleteIpAllowListEntries({
     existScopedIpAllowListEntries,
     'cidr',
   );
-  core.info(
+  core.debug(
     `getToDeleteIpAllowListEntries.groupByCidrOnExpectCidrEntries: ${JSON.stringify(
       groupByCidrOnExpectCidrEntries,
     )}`,
   );
-  core.info(
+  core.debug(
     `getToDeleteIpAllowListEntries.groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
       groupByCidrOnExistScopedIpAllowListEntries,
     )}`,
@@ -34118,7 +34130,7 @@ function getToDeleteIpAllowListEntries({
     _.keys(groupByCidrOnExistScopedIpAllowListEntries),
     _.keys(groupByCidrOnExpectCidrEntries),
   );
-  core.info(`getToDeleteIpAllowListEntries.toDeleteCidrs: ${JSON.stringify(toDeleteCidrs)}`);
+  core.debug(`getToDeleteIpAllowListEntries.toDeleteCidrs: ${JSON.stringify(toDeleteCidrs)}`);
 
   const toDeleteIpAllowListEntries = toDeleteCidrs.map((cidr) => {
     return groupByCidrOnExistScopedIpAllowListEntries[cidr][0];
@@ -34138,12 +34150,12 @@ function getToCreateIpAllowListEntries({
     'cidr',
   );
 
-  core.info(
+  core.debug(
     `getToCreateIpAllowListEntries.groupByCidrOnExpectCidrEntries: ${JSON.stringify(
       groupByCidrOnExpectCidrEntries,
     )}`,
   );
-  core.info(
+  core.debug(
     `getToCreateIpAllowListEntries.groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
       groupByCidrOnExistScopedIpAllowListEntries,
     )}`,
@@ -34153,7 +34165,7 @@ function getToCreateIpAllowListEntries({
     _.keys(groupByCidrOnExpectCidrEntries),
     _.keys(groupByCidrOnExistScopedIpAllowListEntries),
   );
-  core.info(`getToCreateIpAllowListEntries.toCreateCidrs: ${JSON.stringify(toCreateCidrs)}`);
+  core.debug(`getToCreateIpAllowListEntries.toCreateCidrs: ${JSON.stringify(toCreateCidrs)}`);
 
   const toCreateIpAllowListEntries = toCreateCidrs.map((cidr) => {
     return groupByCidrOnExpectCidrEntries[cidr][0];
@@ -34171,12 +34183,12 @@ function getToUpdateIpAllowListEntries({
     'cidr',
   );
 
-  core.info(
+  core.debug(
     `getToUpdateIpAllowListEntries.groupByCidrOnExpectCidrEntries: ${JSON.stringify(
       groupByCidrOnExpectCidrEntries,
     )}`,
   );
-  core.info(
+  core.debug(
     `getToUpdateIpAllowListEntries.groupByCidrOnExistScopedIpAllowListEntries: ${JSON.stringify(
       groupByCidrOnExistScopedIpAllowListEntries,
     )}`,
@@ -34198,7 +34210,7 @@ function getToUpdateIpAllowListEntries({
       );
     });
 
-  core.info(
+  core.debug(
     `getToUpdateIpAllowListEntries.toUpdateTupleCidrEntryWithIpAllowListEntry: ${JSON.stringify(
       toUpdateTupleCidrEntryWithIpAllowListEntry,
     )}`,
@@ -46860,7 +46872,7 @@ async function run() {
       expectCidrEntries,
     }).map(([cidrEntry, ipAllowListEntry]) => {
       return new IpAllowListEntry({
-        ...ipAllowListEntry,
+        ...ipAllowListEntry.toDictionary(),
         name: cidrEntry.name,
         isActive: cidrEntry.isActive,
       });
