@@ -33881,6 +33881,19 @@ function CreateGithubClient(token, maxRetries) {
 
 /***/ }),
 
+/***/ 4438:
+/***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
+
+"use strict";
+__nccwpck_require__.r(__webpack_exports__);
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   "FULLY_QUALIFIED_SCOPE_FUNC": () => (/* binding */ FULLY_QUALIFIED_SCOPE_FUNC)
+/* harmony export */ });
+const FULLY_QUALIFIED_SCOPE_FUNC = (scope) => `${scope} made by github action`;
+
+
+/***/ }),
+
 /***/ 4521:
 /***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
 
@@ -34050,6 +34063,7 @@ const Bottleneck = __nccwpck_require__(7356);
 const { Octokit } = __nccwpck_require__(5375);
 const _ = __nccwpck_require__(5067);
 const { env } = __nccwpck_require__(4521);
+const { FULLY_QUALIFIED_SCOPE_FUNC } = __nccwpck_require__(4438);
 
 const {
   CreateIpAllowListEntryCommand,
@@ -34068,12 +34082,12 @@ async function getMetaCIDRs({ metadataKey }) {
   return metadata[metadataKey];
 }
 
-async function getMetaCidrEntries({ metadataKey }) {
+async function getMetaCidrEntries({ metadataKey, scope }) {
   const cidrs = await getMetaCIDRs({ metadataKey });
   const cidrEntries = cidrs.map(
     (cidr) =>
       new CidrEntry({
-        name: '@scope made by github action',
+        name: FULLY_QUALIFIED_SCOPE_FUNC(scope),
         cidr,
         isActive: true,
       }),
@@ -34087,7 +34101,14 @@ function getAdditionalCidrEntries(value) {
   try {
     const parsedCidrEntries = YAML.parse(value);
     core.debug(`yaml parse: ${JSON.stringify(parsedCidrEntries)}`);
-    cidrEntries = parsedCidrEntries.map((cidrEntry) => new CidrEntry(cidrEntry));
+    cidrEntries = parsedCidrEntries.map(
+      (cidrEntry) =>
+        new CidrEntry({
+          name: `${FULLY_QUALIFIED_SCOPE_FUNC(scope)} ${cidrEntry.name}`,
+          cidr: cidrEntry.cidr,
+          isActive: cidrEntry.isActive,
+        }),
+    );
     core.debug(`getAdditionalCidrEntries: ${JSON.stringify(cidrEntries)}`);
   } catch (err) {
     throw new Error(`additionalCidrEntries yaml string cannot parse ${err}`);
@@ -46801,6 +46822,7 @@ async function run() {
     const metadataKey = core.getInput('metadata_key');
     const additionalCidrEntries = core.getInput('additional_cidr_entries');
     const scope = core.getInput('scope');
+    const mode = core.getInput('mode');
 
     const octokit = CreateGithubClient(githubToken);
 
@@ -46816,7 +46838,7 @@ async function run() {
       });
 
     if (metadataKey) {
-      const cidrEntries = await getMetaCidrEntries({ metadataKey });
+      const cidrEntries = await getMetaCidrEntries({ metadataKey, scope });
       if (cidrEntries) {
         expectCidrEntries.push(...cidrEntries);
       } else {

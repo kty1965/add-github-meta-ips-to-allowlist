@@ -19,6 +19,12 @@ A GitHub Action that will load Enterprise IP Allow List Entries from the [GitHub
 | `scope`                   | false    | default: `@scope`, select prefix of name                                                                                                                                |
 | `mode`                    | false    | default: `sync`, mode `sync`, `delete` available                                                                                                                        |
 
+## Environments
+
+| name              | description                                 |
+| ----------------- | ------------------------------------------- |
+| `API_CONCURRENCY` | using request to github graphql concurrency |
+
 ## Examples
 
 > if you change input `scope` already created allowlist does not changed.

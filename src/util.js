@@ -5,6 +5,7 @@ const Bottleneck = require('bottleneck');
 const { Octokit } = require('@octokit/rest');
 const _ = require('underscore');
 const { env } = require('./env');
+const { FULLY_QUALIFIED_SCOPE_FUNC } = require('./constants');
 
 const {
   CreateIpAllowListEntryCommand,
@@ -28,7 +29,7 @@ export async function getMetaCidrEntries({ metadataKey, scope }) {
   const cidrEntries = cidrs.map(
     (cidr) =>
       new CidrEntry({
-        name: `${scope} made by github action`,
+        name: FULLY_QUALIFIED_SCOPE_FUNC(scope),
         cidr,
         isActive: true,
       }),
@@ -42,7 +43,14 @@ export function getAdditionalCidrEntries(value) {
   try {
     const parsedCidrEntries = YAML.parse(value);
     core.debug(`yaml parse: ${JSON.stringify(parsedCidrEntries)}`);
-    cidrEntries = parsedCidrEntries.map((cidrEntry) => new CidrEntry(cidrEntry));
+    cidrEntries = parsedCidrEntries.map(
+      (cidrEntry) =>
+        new CidrEntry({
+          name: `${FULLY_QUALIFIED_SCOPE_FUNC(scope)} ${cidrEntry.name}`,
+          cidr: cidrEntry.cidr,
+          isActive: cidrEntry.isActive,
+        }),
+    );
     core.debug(`getAdditionalCidrEntries: ${JSON.stringify(cidrEntries)}`);
   } catch (err) {
     throw new Error(`additionalCidrEntries yaml string cannot parse ${err}`);
