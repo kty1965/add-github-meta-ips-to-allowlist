@@ -55,6 +55,10 @@ async function run() {
       expectCidrEntries.push(...cidrEntries);
     }
 
+    if (mode === 'delete') {
+      expectCidrEntries.splice(0);
+    }
+
     core.info(`number of existScopedIpAllowListEntries: ${existScopedIpAllowListEntries.length}`);
     core.info(`number of expectCidrEntries: ${expectCidrEntries.length}`);
 
