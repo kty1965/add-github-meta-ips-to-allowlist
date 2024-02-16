@@ -34096,10 +34096,10 @@ async function getMetaCidrEntries({ metadataKey, scope }) {
   return cidrEntries;
 }
 
-function getAdditionalCidrEntries(value) {
+function getAdditionalCidrEntries({ additionalCidrEntries, scope }) {
   let cidrEntries;
   try {
-    const parsedCidrEntries = YAML.parse(value);
+    const parsedCidrEntries = YAML.parse(additionalCidrEntries);
     core.debug(`yaml parse: ${JSON.stringify(parsedCidrEntries)}`);
     cidrEntries = parsedCidrEntries.map(
       (cidrEntry) =>
@@ -46848,7 +46848,7 @@ async function run() {
       }
     }
     if (additionalCidrEntries) {
-      const cidrEntries = getAdditionalCidrEntries(additionalCidrEntries);
+      const cidrEntries = getAdditionalCidrEntries({ additionalCidrEntries, scope });
       expectCidrEntries.push(...cidrEntries);
     }
 

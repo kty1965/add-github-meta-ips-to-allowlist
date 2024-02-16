@@ -38,10 +38,10 @@ export async function getMetaCidrEntries({ metadataKey, scope }) {
   return cidrEntries;
 }
 
-export function getAdditionalCidrEntries(value) {
+export function getAdditionalCidrEntries({ additionalCidrEntries, scope }) {
   let cidrEntries;
   try {
-    const parsedCidrEntries = YAML.parse(value);
+    const parsedCidrEntries = YAML.parse(additionalCidrEntries);
     core.debug(`yaml parse: ${JSON.stringify(parsedCidrEntries)}`);
     cidrEntries = parsedCidrEntries.map(
       (cidrEntry) =>
