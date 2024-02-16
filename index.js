@@ -51,7 +51,7 @@ async function run() {
       }
     }
     if (additionalCidrEntries) {
-      const cidrEntries = getAdditionalCidrEntries(additionalCidrEntries);
+      const cidrEntries = getAdditionalCidrEntries({ additionalCidrEntries, scope });
       expectCidrEntries.push(...cidrEntries);
     }
 
