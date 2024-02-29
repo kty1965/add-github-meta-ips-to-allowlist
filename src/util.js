@@ -193,7 +193,7 @@ export async function deleteIpAllowListEntries({ ipAllowListEntries, octokit }) 
   const taskScheduler = new Bottleneck({ maxConcurrent: env.api.concurrency });
   const promises = ipAllowListEntries.map((ipAllowListEntry) => {
     return taskScheduler.schedule(() =>
-      DeleteIpAllowListEntryCommand({ octokit, ownerId, ipAllowListEntry }),
+      DeleteIpAllowListEntryCommand({ octokit, ipAllowListEntry }),
     );
   });
 
